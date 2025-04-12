@@ -6,6 +6,7 @@ use App\Http\Controllers\PuestoController;
 use App\Http\Controllers\SolicitudVacacionController;
 use App\Http\Controllers\SucursalController;
 
+
 Route::resource('puestos', PuestoController::class);
 
 // Rutas para Beneficiarios
@@ -23,6 +24,9 @@ Route::post('empleados', [EmpleadoController::class, 'store'])->name('empleados.
 Route::get('empleados/{id_empleado}/edit', [EmpleadoController::class, 'edit'])->name('empleados.edit');
 Route::put('empleados/{id_empleado}', [EmpleadoController::class, 'update'])->name('empleados.update');
 Route::delete('empleados/{id_empleado}', [EmpleadoController::class, 'destroy'])->name('empleados.destroy');
+Route::get('/empleados/export-excel', [EmpleadoController::class, 'exportExcel'])->name('empleados.exportExcel');
+Route::get('/empleados/export/pdf', [EmpleadoController::class, 'exportPDF'])->name('empleados.exportPDF');
+
 
 // RUTAS PARA PUESTOS
 Route::get('/puestos', [PuestoController::class, 'index'])->name('puestos.index'); // Listar todos
