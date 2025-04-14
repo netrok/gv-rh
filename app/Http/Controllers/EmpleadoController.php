@@ -18,10 +18,11 @@ class EmpleadoController extends Controller
     {
         $query = Empleado::query()->with('sucursal');
 
+        // Filtros
         if ($request->filled('nombre')) {
             $query->where(function ($q) use ($request) {
                 $q->where('nombres', 'like', '%' . $request->nombre . '%')
-                  ->orWhere('apellidos', 'like', '%' . $request->nombre . '%');
+                    ->orWhere('apellidos', 'like', '%' . $request->nombre . '%');
             });
         }
 
@@ -44,12 +45,28 @@ class EmpleadoController extends Controller
         return Excel::download(new EmpleadosExport, 'empleados.xlsx');
     }
 
+    // Exporta a PDF 1 empleado
     public function exportPDF()
     {
         $empleados = Empleado::select('num_empleado', 'nombres', 'apellidos', 'email')->get();
         $pdf = Pdf::loadView('empleados.export-pdf', compact('empleados'));
         return $pdf->download('empleados.pdf');
     }
+
+    // Exporta a PDF todos los empleados
+
+    public function exportarPdf()
+    {
+        // Obtener todos los empleados
+        $empleados = Empleado::all();
+
+        // Generar el PDF con todos los empleados
+        $pdf = PDF::loadView('empleados.exportar-pdf', compact('empleados'));
+
+        // Descargar o mostrar el PDF
+        return $pdf->stream('empleados.pdf');
+    }
+
 
     public function create()
     {
@@ -141,6 +158,9 @@ class EmpleadoController extends Controller
     public function destroy($id)
     {
         $empleado = Empleado::findOrFail($id);
+        if ($empleado->imagen) {
+            Storage::delete('public/' . $empleado->imagen);
+        }
         $empleado->delete();
 
         return redirect()->route('empleados.index')->with('success', 'Empleado eliminado correctamente.');

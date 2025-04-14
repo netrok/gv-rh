@@ -2,36 +2,36 @@
 
 @section('content')
 
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const forms = document.querySelectorAll('.form-eliminar');
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const forms = document.querySelectorAll('.form-eliminar');
 
-        forms.forEach(form => {
-            form.addEventListener('submit', function (e) {
-                e.preventDefault();
+                forms.forEach(form => {
+                    form.addEventListener('submit', function (e) {
+                        e.preventDefault();
 
-                const empleadoNombre = form.querySelector('.btn-eliminar').dataset.nombre;
+                        const empleadoNombre = form.querySelector('.btn-eliminar').dataset.nombre;
 
-                Swal.fire({
-                    title: `¿Eliminar a ${empleadoNombre}?`,
-                    text: "Esta acción no se puede deshacer.",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: 'Sí, eliminar',
-                    cancelButtonText: 'Cancelar'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        form.submit();
-                    }
+                        Swal.fire({
+                            title: `¿Eliminar a ${empleadoNombre}?`,
+                            text: "Esta acción no se puede deshacer.",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#d33',
+                            cancelButtonColor: '#6c757d',
+                            confirmButtonText: 'Sí, eliminar',
+                            cancelButtonText: 'Cancelar'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                form.submit();
+                            }
+                        });
+                    });
                 });
             });
-        });
-    });
-</script>
-@endpush
+        </script>
+    @endpush
 
     <div class="container">
         <h1 class="mb-4">Listado de Empleados</h1>
@@ -68,9 +68,9 @@
                 <a href="{{ route('empleados.exportExcel') }}" class="btn btn-outline-success me-2">
                     <i class="bi bi-file-earmark-excel"></i> Exportar Excel
                 </a>
-                <a href="{{ route('empleados.exportPdf') }}" class="btn btn-outline-danger">
-                    <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
-                </a>
+                <a href="{{ route('empleados.exportarPdf') }}" class="btn btn-danger" target="_blank">Exportar a PDF</a>
+
+
             </div>
         </div>
 
