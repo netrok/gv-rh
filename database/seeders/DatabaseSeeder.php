@@ -6,38 +6,44 @@ use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
-class RolesAndPermissionsSeeder extends Seeder
+class DatabaseSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
-        // Reset cache
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
-
         // Crear permisos
         $permissions = [
             'ver empleados',
             'crear empleados',
             'editar empleados',
             'eliminar empleados',
+            'ver beneficiarios',
+            'crear beneficiarios',
+            'editar beneficiarios',
+            'eliminar beneficiarios'
         ];
 
         foreach ($permissions as $permission) {
             Permission::firstOrCreate(['name' => $permission]);
         }
 
-        // Crear roles
-        $admin = Role::firstOrCreate(['name' => 'admin']);
-        $empleado = Role::firstOrCreate(['name' => 'empleado']);
+        // Crear roles y asignar permisos
+        $adminRole = Role::firstOrCreate(['name' => 'admin']);
+        $adminRole->syncPermissions(Permission::all());
 
-        // Asignar permisos a los roles
-        $admin->givePermissionTo(Permission::all());
-        $empleado->givePermissionTo(['ver empleados']);
+        $userRole = Role::firstOrCreate(['name' => 'user']);
+        $userRole->syncPermissions(['ver empleados', 'ver beneficiarios']);
 
-        // Asignar rol a usuario administrador (ajusta el ID según sea necesario)
-        $user = User::find(1);
-        if ($user) {
-            $user->assignRole('admin');
-        }
+        // Crear usuario admin
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@example.com'],
+            [
+                'name' => 'Admin',
+                'password' => Hash::make('riesenhammer')
+            ]
+        );
+
+        $admin->assignRole('admin');
     }
 }

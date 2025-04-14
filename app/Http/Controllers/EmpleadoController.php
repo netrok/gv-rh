@@ -12,36 +12,32 @@ use App\Exports\EmpleadosExport;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
 
-
-
 class EmpleadoController extends Controller
 {
-    // Mostrar todos los empleados
     public function index(Request $request)
-{
-    $query = Empleado::query()->with('sucursal');
+    {
+        $query = Empleado::query()->with('sucursal');
 
-    if ($request->filled('nombre')) {
-        $query->where(function ($q) use ($request) {
-            $q->where('nombres', 'like', '%' . $request->nombre . '%')
-              ->orWhere('apellidos', 'like', '%' . $request->nombre . '%');
-        });
+        if ($request->filled('nombre')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('nombres', 'like', '%' . $request->nombre . '%')
+                  ->orWhere('apellidos', 'like', '%' . $request->nombre . '%');
+            });
+        }
+
+        if ($request->filled('sucursal')) {
+            $query->where('fk_id_sucursal', $request->sucursal);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $empleados = $query->paginate(10)->withQueryString();
+        $sucursales = Sucursal::all();
+
+        return view('empleados.index', compact('empleados', 'sucursales'));
     }
-
-    if ($request->filled('sucursal')) {
-        $query->where('fk_id_sucursal', $request->sucursal);
-    }
-
-    if ($request->filled('status')) {
-        $query->where('status', $request->status);
-    }
-
-    $empleados = $query->paginate(10)->withQueryString(); // Para mantener los filtros en la paginación
-
-    $sucursales = Sucursal::all();
-
-    return view('empleados.index', compact('empleados', 'sucursales'));
-}
 
     public function exportExcel()
     {
@@ -50,13 +46,11 @@ class EmpleadoController extends Controller
 
     public function exportPDF()
     {
-        $empleados = \App\Models\Empleado::select('num_empleado', 'nombres', 'apellidos', 'email')->get();
-
+        $empleados = Empleado::select('num_empleado', 'nombres', 'apellidos', 'email')->get();
         $pdf = Pdf::loadView('empleados.export-pdf', compact('empleados'));
         return $pdf->download('empleados.pdf');
     }
 
-    // Mostrar formulario de creación
     public function create()
     {
         $puestos = Puesto::all();
@@ -64,7 +58,6 @@ class EmpleadoController extends Controller
         return view('empleados.create', compact('puestos', 'sucursales'));
     }
 
-    // Guardar un nuevo empleado
     public function store(Request $request)
     {
         $request->validate([
@@ -98,7 +91,6 @@ class EmpleadoController extends Controller
         return redirect()->route('empleados.index')->with('success', 'Empleado creado con éxito.');
     }
 
-    // Mostrar formulario de edición
     public function edit($id)
     {
         $empleado = Empleado::with(['puesto', 'sucursal'])->findOrFail($id);
@@ -108,7 +100,6 @@ class EmpleadoController extends Controller
         return view('empleados.edit', compact('empleado', 'puestos', 'sucursales'));
     }
 
-    // Actualizar empleado
     public function update(Request $request, $id)
     {
         $empleado = Empleado::findOrFail($id);
@@ -133,17 +124,12 @@ class EmpleadoController extends Controller
             'imagen' => 'nullable|image|max:2048',
         ]);
 
-        // Actualiza los datos excepto la imagen
         $empleado->fill($request->except('imagen'));
 
-        // Si se sube una nueva imagen
         if ($request->hasFile('imagen')) {
-            // Eliminar la imagen anterior si existe
             if ($empleado->imagen) {
                 Storage::delete('public/' . $empleado->imagen);
             }
-
-            // Guardar nueva imagen
             $empleado->imagen = $request->file('imagen')->store('empleados', 'public');
         }
 
@@ -152,7 +138,6 @@ class EmpleadoController extends Controller
         return redirect()->route('empleados.index')->with('success', 'Empleado actualizado con éxito.');
     }
 
-    // Eliminar empleado
     public function destroy($id)
     {
         $empleado = Empleado::findOrFail($id);
@@ -162,19 +147,17 @@ class EmpleadoController extends Controller
     }
 
     public function show($id_empleado)
-{
-    $empleado = Empleado::findOrFail($id_empleado);
-    return view('empleados.show', compact('empleado'));
-}
-public function generarPdf($id)
-{
-    $empleado = Empleado::findOrFail($id);
+    {
+        $empleado = Empleado::findOrFail($id_empleado);
+        return view('empleados.show', compact('empleado'));
+    }
 
-    // Ruta absoluta del archivo (debe estar en disco 'public')
-    $imagenPath = $empleado->imagen ? Storage::disk('public')->path($empleado->imagen) : null;
+    public function generarPdf($id)
+    {
+        $empleado = Empleado::findOrFail($id);
+        $imagenPath = $empleado->imagen ? Storage::disk('public')->path($empleado->imagen) : null;
 
-    $pdf = PDF::loadView('empleados.pdf', compact('empleado', 'imagenPath'));
-    return $pdf->stream('empleado_' . $empleado->num_empleado . '.pdf');
-}
-
+        $pdf = PDF::loadView('empleados.pdf', compact('empleado', 'imagenPath'));
+        return $pdf->stream('empleado_' . $empleado->num_empleado . '.pdf');
+    }
 }

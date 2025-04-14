@@ -2,31 +2,38 @@
 
 @section('content')
 <div class="container">
-    <h1>Roles</h1>
+    <h1>Gestión de Roles</h1>
 
-    <!-- Listado de Roles -->
-    <ul>
-        @foreach($roles as $role)
-            <li>{{ $role->name }}</li>
-        @endforeach
-    </ul>
+    @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
 
-    <h2>Assign Permissions to a Role</h2>
-
-    <!-- Formulario para asignar permisos -->
-    <form action="{{ url('roles/'.$role->id.'/permissions') }}" method="POST">
+    <!-- Crear rol -->
+    <form action="{{ route('roles.create') }}" method="POST" class="mb-4">
         @csrf
-
-        <h3>Permissions</h3>
-        @foreach($permissions as $permission)
-            <label>
-                <input type="checkbox" name="permissions[]" value="{{ $permission->id }}">
-                {{ $permission->name }}
-            </label>
-            <br>
-        @endforeach
-
-        <button type="submit">Assign Permissions</button>
+        <input type="text" name="name" placeholder="Nombre del rol" required>
+        <button type="submit" class="btn btn-success">Crear Rol</button>
     </form>
+
+    <!-- Mostrar roles -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($roles as $role)
+                <tr>
+                    <td>{{ $role->name }}</td>
+                    <td>
+                        <a href="{{ route('roles.assignPermissions', $role->id) }}" class="btn btn-warning btn-sm">Asignar Permisos</a>
+                        <a href="{{ route('roles.assignRoleToUser', $role->id) }}" class="btn btn-primary btn-sm">Asignar a Usuario</a>
+                    </td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
 </div>
 @endsection
