@@ -12,6 +12,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\RolePermissionController;
 
 
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -78,6 +79,12 @@ Route::put('empleados/{id_empleado}', [EmpleadoController::class, 'update'])->na
 Route::delete('empleados/{id_empleado}', [EmpleadoController::class, 'destroy'])->name('empleados.destroy');
 Route::get('/empleados/export/excel', [EmpleadoExportController::class, 'exportExcel'])->name('empleados.exportExcel');
 Route::get('/empleados/export/pdf', [EmpleadoExportController::class, 'exportPdf'])->name('empleados.exportPdf');
+Route::get('empleados/{id_empleado}', [EmpleadoController::class, 'show'])->name('empleados.show');
+Route::get('empleados/{id_empleado}/pdf', [EmpleadoController::class, 'generatePdf'])->name('empleados.pdf');
+Route::get('empleados/{id_empleado}', [EmpleadoController::class, 'show'])->name('empleados.show');
+Route::get('empleados/{id_empleado}/pdf', [EmpleadoController::class, 'generarPdf'])->name('empleados.pdf');
+
+
 
 
 // RUTAS PARA PUESTOS

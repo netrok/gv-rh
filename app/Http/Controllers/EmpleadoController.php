@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\EmpleadosExport;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
+
+
 
 class EmpleadoController extends Controller
 {
@@ -157,4 +160,21 @@ class EmpleadoController extends Controller
 
         return redirect()->route('empleados.index')->with('success', 'Empleado eliminado correctamente.');
     }
+
+    public function show($id_empleado)
+{
+    $empleado = Empleado::findOrFail($id_empleado);
+    return view('empleados.show', compact('empleado'));
+}
+public function generarPdf($id)
+{
+    $empleado = Empleado::findOrFail($id);
+
+    // Ruta absoluta del archivo (debe estar en disco 'public')
+    $imagenPath = $empleado->imagen ? Storage::disk('public')->path($empleado->imagen) : null;
+
+    $pdf = PDF::loadView('empleados.pdf', compact('empleado', 'imagenPath'));
+    return $pdf->stream('empleado_' . $empleado->num_empleado . '.pdf');
+}
+
 }
