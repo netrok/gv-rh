@@ -6,7 +6,41 @@ use App\Http\Controllers\PuestoController;
 use App\Http\Controllers\SolicitudVacacionController;
 use App\Http\Controllers\SucursalController;
 use App\Http\Controllers\EmpleadoExportController;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterController;
 
+Route::get('/', function () {
+    return view('welcome');
+});
+
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/admin/prueba', function () {
+        return '¡Hola Admin! Has accedido a una ruta protegida.';
+    });
+});
+
+Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('login', [LoginController::class, 'login']);
+Route::post('logout', [LoginController::class, 'logout'])->name('logout');
+
+Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::post('register', [RegisterController::class, 'register']);
+
+// Ruta solo para administradores
+Route::get('/admin', function () {
+    return 'Bienvenido al panel de administración';
+})->middleware('role:admin');
+
+// Ruta protegida por permiso
+Route::get('/empleados', function () {
+    return 'Lista de empleados (permiso requerido)';
+})->middleware('permission:ver empleados');
+
+// Ruta protegida por rol o permiso
+Route::get('/configuracion', function () {
+    return 'Configuración avanzada';
+})->middleware('role_or_permission:admin|editar empleados');
 
 
 Route::resource('puestos', PuestoController::class);
@@ -56,3 +90,10 @@ Route::get('/sucursales/{id}', [SucursalController::class, 'show'])->name('sucur
 Route::get('/sucursales/{id}/edit', [SucursalController::class, 'edit'])->name('sucursales.edit');
 Route::put('/sucursales/{id}', [SucursalController::class, 'update'])->name('sucursales.update');
 Route::delete('/sucursales/{id}', [SucursalController::class, 'destroy'])->name('sucursales.destroy');
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
