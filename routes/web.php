@@ -9,9 +9,25 @@ use App\Http\Controllers\EmpleadoExportController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\RolePermissionController;
+
 
 Route::get('/', function () {
     return view('welcome');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('roles', [RolePermissionController::class, 'index'])->name('roles.index');
+    Route::post('roles', [RolePermissionController::class, 'createRole']);
+    Route::post('roles/{roleId}/permissions', [RolePermissionController::class, 'assignPermissions']);
+    Route::post('users/{userId}/assign-role', [RolePermissionController::class, 'assignRoleToUser']);
+});
+
+Route::middleware('auth')->group(function() {
+    // Ruta para editar permisos de un rol
+    Route::get('roles/{roleId}/permissions', [RoleController::class, 'editPermissions'])->name('roles.editPermissions');
+    // Ruta para actualizar los permisos de un rol
+    Route::put('roles/{roleId}/permissions', [RoleController::class, 'updatePermissions'])->name('roles.updatePermissions');
 });
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
