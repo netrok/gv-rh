@@ -2,55 +2,51 @@
 
 @section('content')
 <div class="container">
-    <h1>Empleados</h1>
-
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <a href="{{ route('empleados.create') }}" class="btn btn-success">+ Agregar Empleado</a>
-    </div>
+    <h1 class="mb-4">Listado de Empleados</h1>
 
     <!-- Filtros -->
-    <form method="GET" action="{{ route('empleados.index') }}" class="row g-2 mb-4">
+    <form action="{{ route('empleados.index') }}" method="GET" class="row g-3 mb-4">
         <div class="col-md-4">
-            <input type="text" name="nombre" class="form-control" placeholder="Buscar por nombre o apellido" value="{{ request('nombre') }}">
+            <input type="text" name="buscar" class="form-control" placeholder="Buscar por nombre o número" value="{{ request('buscar') }}">
         </div>
         <div class="col-md-3">
-            <select name="sucursal" class="form-control">
-                <option value="">-- Todas las sucursales --</option>
-                @foreach ($sucursales as $sucursal)
-                    <option value="{{ $sucursal->id_sucursal }}" {{ request('sucursal') == $sucursal->id_sucursal ? 'selected' : '' }}>
-                        {{ $sucursal->nombre_sucursal }}
-                    </option>
-                @endforeach
+            <select name="status" class="form-control">
+                <option value="">-- Estado --</option>
+                <option value="activo" {{ request('status') == 'activo' ? 'selected' : '' }}>Activo</option>
+                <option value="inactivo" {{ request('status') == 'inactivo' ? 'selected' : '' }}>Inactivo</option>
             </select>
         </div>
         <div class="col-md-3">
-            <select name="estado" class="form-control">
-                <option value="">-- Todos los estados --</option>
-                <option value="activo" {{ request('estado') == 'activo' ? 'selected' : '' }}>Activo</option>
-                <option value="inactivo" {{ request('estado') == 'inactivo' ? 'selected' : '' }}>Inactivo</option>
-            </select>
+            <button type="submit" class="btn btn-primary w-100">Filtrar</button>
         </div>
-        <div class="col-md-2 d-flex">
-            <button type="submit" class="btn btn-primary me-2 w-100">Filtrar</button>
+        <div class="col-md-2">
             <a href="{{ route('empleados.index') }}" class="btn btn-secondary w-100">Limpiar</a>
         </div>
     </form>
 
-    <a href="{{ route('empleados.exportExcel') }}" class="btn btn-success mb-3">Exportar a Excel</a>
-    <a href="{{ route('empleados.exportPDF') }}" class="btn btn-danger mb-3">Exportar a PDF</a>
+    <!-- Botones de exportación -->
+    <div class="mb-3 d-flex justify-content-between">
+        <a href="{{ route('empleados.create') }}" class="btn btn-success">+ Agregar Empleado</a>
+        <div>
+            <a href="{{ route('empleados.exportExcel') }}" class="btn btn-outline-success me-2">
+                📥 Exportar Excel
+            </a>
+            <a href="{{ route('empleados.exportPdf') }}" class="btn btn-outline-danger">
+                📄 Exportar PDF
+            </a>
+        </div>
+    </div>
 
-
-
-    <!-- Tabla de empleados -->
+    <!-- Tabla -->
     <div class="table-responsive">
-        <table class="table table-bordered table-hover align-middle">
-            <thead class="table-light">
+        <table class="table table-striped table-bordered">
+            <thead class="table-dark">
                 <tr>
                     <th>Num. Empleado</th>
                     <th>Nombre</th>
                     <th>Apellidos</th>
                     <th>Email</th>
-                    <th>Estado</th>
+                    <th>Status</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -67,18 +63,18 @@
                             </span>
                         </td>
                         <td>
-                            <a href="{{ route('empleados.edit', $empleado->id_empleado) }}" class="btn btn-sm btn-warning">Editar</a>
+                            <a href="{{ route('empleados.edit', $empleado->id_empleado) }}" class="btn btn-sm btn-warning">✏️ Editar</a>
 
-                            <form action="{{ route('empleados.destroy', $empleado->id_empleado) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Estás seguro de eliminar este empleado?');">
+                            <form action="{{ route('empleados.destroy', $empleado->id_empleado) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('¿Seguro que deseas eliminar este empleado?');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                                <button type="submit" class="btn btn-sm btn-danger">🗑 Eliminar</button>
                             </form>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="text-center">No se encontraron empleados con los filtros aplicados.</td>
+                        <td colspan="6">No se encontraron empleados.</td>
                     </tr>
                 @endforelse
             </tbody>
@@ -86,8 +82,8 @@
     </div>
 
     <!-- Paginación -->
-    <div class="mt-3">
-        {{ $empleados->links() }}
+    <div class="d-flex justify-content-center mt-4">
+        {{ $empleados->links('pagination::bootstrap-5') }}
     </div>
 </div>
 @endsection

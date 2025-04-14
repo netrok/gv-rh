@@ -15,33 +15,30 @@ class EmpleadoController extends Controller
 {
     // Mostrar todos los empleados
     public function index(Request $request)
-    {
-        $query = Empleado::query();
+{
+    $query = Empleado::query()->with('sucursal');
 
-        // Aplicar filtros si existen
-        if ($request->filled('nombre')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('nombres', 'LIKE', '%' . $request->nombre . '%')
-                    ->orWhere('apellidos', 'LIKE', '%' . $request->nombre . '%');
-            });
-        }
-
-        if ($request->filled('sucursal')) {
-            $query->where('fk_id_sucursal', $request->sucursal);
-        }
-
-        if ($request->filled('estado')) {
-            $query->where('status', $request->estado);
-        }
-
-        // Obtener resultados paginados
-        $empleados = $query->orderBy('num_empleado', 'asc')->paginate(10)->appends($request->all());
-
-        // Obtener opciones para filtros
-        $sucursales = Sucursal::all();
-
-        return view('empleados.index', compact('empleados', 'sucursales'));
+    if ($request->filled('nombre')) {
+        $query->where(function ($q) use ($request) {
+            $q->where('nombres', 'like', '%' . $request->nombre . '%')
+              ->orWhere('apellidos', 'like', '%' . $request->nombre . '%');
+        });
     }
+
+    if ($request->filled('sucursal')) {
+        $query->where('fk_id_sucursal', $request->sucursal);
+    }
+
+    if ($request->filled('status')) {
+        $query->where('status', $request->status);
+    }
+
+    $empleados = $query->paginate(10)->withQueryString(); // Para mantener los filtros en la paginación
+
+    $sucursales = Sucursal::all();
+
+    return view('empleados.index', compact('empleados', 'sucursales'));
+}
 
     public function exportExcel()
     {
