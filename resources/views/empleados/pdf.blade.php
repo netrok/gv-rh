@@ -5,108 +5,129 @@
     <title>Ficha del Empleado - {{ $empleado->num_empleado }}</title>
     <style>
         body {
-            font-family: DejaVu Sans, sans-serif;
+            font-family: Arial, sans-serif;
             font-size: 12px;
-            color: #333;
-            padding: 20px;
-            position: relative;
+            color: #2c3e50;
+            padding: 30px;
         }
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid #ccc;
+            border-bottom: 3px solid #2c3e50;
             padding-bottom: 10px;
             margin-bottom: 20px;
         }
         .logo {
-            width: 120px;
+            width: 100px;
         }
-        h1 {
-            font-size: 20px;
-            margin: 0;
-        }
-        .fecha {
-            font-size: 12px;
+        .empresa-info {
             text-align: right;
+        }
+        .empresa-info h1 {
+            margin: 0;
+            font-size: 18px;
+            color: #2c3e50;
+        }
+        .empresa-info p {
+            margin: 0;
+            font-size: 11px;
+        }
+        .titulo {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
         }
         .datos {
             display: flex;
-            gap: 20px;
+            gap: 30px;
         }
         .foto {
-            width: 150px;
+            width: 130px;
             height: auto;
-            border-radius: 10px;
+            border-radius: 6px;
             border: 1px solid #ccc;
         }
         .tabla-datos {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 10px;
         }
         .tabla-datos th, .tabla-datos td {
-            padding: 8px;
+            padding: 6px 10px;
             text-align: left;
-            vertical-align: top;
+            border-bottom: 1px solid #eee;
         }
         .tabla-datos th {
+            background-color: #f9f9f9;
+            color: #34495e;
             width: 200px;
-            background-color: #f2f2f2;
+        }
+        .section-title {
+            background-color: #2c3e50;
+            color: white;
+            padding: 5px 10px;
+            margin-top: 20px;
+            font-size: 14px;
         }
         .status-activo {
             color: green;
             font-weight: bold;
         }
         .status-inactivo {
-            color: gray;
+            color: #aaa;
             font-weight: bold;
         }
-        .footer {
-            position: absolute;
-            bottom: 30px;
-            left: 20px;
-            right: 20px;
-            text-align: center;
-            font-size: 10px;
-            color: #888;
-        }
         .firma {
-            margin-top: 40px;
+            margin-top: 50px;
             text-align: center;
         }
         .firma img {
-            width: 150px;
+            width: 120px;
+            margin-top: 5px;
+        }
+        .firma p {
+            margin: 5px 0;
         }
         .qr {
             text-align: right;
             margin-top: 10px;
+        }
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 10px;
+            color: #999;
         }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div>
-            <img src="{{ public_path('images/logo.png') }}" class="logo" alt="Logo">
-        </div>
-        <div>
-            <h1>Ficha del Empleado</h1>
-            <p class="fecha">Fecha de generación: {{ \Carbon\Carbon::now()->format('d/m/Y') }}</p>
+        <img src="{{ public_path('images/logo.png') }}" class="logo" alt="Logo">
+        <div class="empresa-info">
+            <h1>Nombre de la Empresa</h1>
+            <p>Ficha del Empleado</p>
+            <p>Fecha: {{ \Carbon\Carbon::now()->format('d/m/Y') }}</p>
         </div>
     </div>
+
+    <div class="titulo">Información General del Empleado</div>
 
     <div class="datos">
         @if($empleado->imagen)
             <div>
-                <img src="{{ public_path('storage/' . $empleado->imagen) }}" alt="Foto" class="foto">
+                <img src="{{ public_path('storage/' . $empleado->imagen) }}" alt="Foto del empleado" class="foto">
             </div>
         @endif
 
         <table class="tabla-datos">
             <tr><th>Número de Empleado:</th><td>{{ $empleado->num_empleado }}</td></tr>
-            <tr><th>Nombre:</th><td>{{ $empleado->nombres }} {{ $empleado->apellidos }}</td></tr>
-            <tr><th>Domicilio:</th><td>{{ $empleado->domicilio }}</td></tr>
+            <tr><th>Nombre Completo:</th><td>{{ $empleado->nombres }} {{ $empleado->apellidos }}</td></tr>
             <tr><th>Fecha de Nacimiento:</th><td>{{ $empleado->fecha_nacimiento }}</td></tr>
+            <tr><th>Domicilio:</th><td>{{ $empleado->domicilio }}</td></tr>
             <tr><th>Email:</th><td>{{ $empleado->email }}</td></tr>
             <tr><th>Teléfono:</th><td>{{ $empleado->telefono }}</td></tr>
             <tr><th>Celular:</th><td>{{ $empleado->celular }}</td></tr>
@@ -132,13 +153,14 @@
     </div>
 
     <div class="firma">
-        <p>__________________________</p>
-        <p>Responsable de RRHH</p>
-        <img src="{{ public_path('images/firma.png') }}" alt="Firma Responsable">
+        <p>______________________________</p>
+        <p>Firma del Responsable de RRHH</p>
+        <img src="{{ public_path('images/firma.png') }}" alt="Firma">
+        <p>Fecha: {{ \Carbon\Carbon::now()->format('d/m/Y') }}</p>
     </div>
 
     <div class="footer">
-        Documento generado automáticamente por el sistema de gestión de empleados.
+        Documento confidencial. Generado automáticamente por el sistema de gestión de empleados.
     </div>
 
 </body>
