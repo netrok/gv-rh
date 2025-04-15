@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Audit;
 
 class Empleado extends Model
 {
@@ -54,5 +55,27 @@ class Empleado extends Model
     public function solicitudesVacaciones()
     {
         return $this->hasMany(SolicitudVacacion::class, 'fk_num_empleado');
+    }
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::updated(function ($empleado) {
+            $changes = $empleado->getChanges();
+            Audit::create([
+                'id_empleado' => $empleado->id_empleado,
+                'action' => 'updated',
+                'changed_data' => json_encode($changes),
+            ]);
+        });
+
+        static::deleted(function ($empleado) {
+            Audit::create([
+                'id_empleado' => $empleado->id_empleado,
+                'action' => 'deleted',
+                'changed_data' => json_encode($empleado->getOriginal()),
+            ]);
+        });
     }
 }

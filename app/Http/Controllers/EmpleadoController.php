@@ -180,4 +180,11 @@ class EmpleadoController extends Controller
         $pdf = PDF::loadView('empleados.pdf', compact('empleado', 'imagenPath'));
         return $pdf->stream('empleado_' . $empleado->num_empleado . '.pdf');
     }
+
+    public function showAudits($id)
+    {
+        $audits = Audit::where('id_empleado', $id)->get();
+        return view('empleados.audits', compact('audits'));
+    }
+
 }

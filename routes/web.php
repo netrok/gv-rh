@@ -62,3 +62,6 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 // Rutas de autenticación estándar de Laravel
 Auth::routes();
+
+Route::get('empleados/{id}/audits', [EmpleadoController::class, 'showAudits']);
+Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
