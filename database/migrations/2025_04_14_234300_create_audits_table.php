@@ -8,16 +8,16 @@ return new class extends Migration {
     /**
      * Run the migrations.
      */
-    public function up()
-    {
-        Schema::create('audits', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('id_empleado')->constrained()->onDelete('cascade');
-            $table->string('action');
-            $table->text('changed_data')->nullable();
-            $table->timestamps();
-        });
-    }
+   // database/migrations/2025_04_14_234300_create_audits_table.php
+public function up()
+{
+    Schema::create('audits', function (Blueprint $table) {
+        $table->id();
+        $table->foreignId('id_empleado'); // solo la columna
+        $table->text('accion');
+        $table->timestamps();
+    });
+}
 
     /**
      * Reverse the migrations.
