@@ -79,3 +79,6 @@ Route::resource('sucursales', SucursalController::class)->middleware('auth')->pa
 ]);
 
 Route::put('/sucursales/{sucursal}', [SucursalController::class, 'update'])->name('sucursales.update');
+
+
+Route::get('/empleados/exportar-pdf', [EmpleadoController::class, 'exportarPdf'])->name('empleados.exportarPdf');
