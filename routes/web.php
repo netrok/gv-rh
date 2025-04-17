@@ -13,7 +13,6 @@ use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-
 // Página principal
 Route::get('/', fn () => view('welcome'));
 
@@ -44,7 +43,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('empleados/{id_empleado}/pdf', [EmpleadoController::class, 'generarPdf'])->name('empleados.pdf');
         Route::get('empleados/export/excel', [EmpleadoExportController::class, 'exportExcel'])->name('empleados.exportExcel');
         Route::get('empleados/export/pdf', [EmpleadoExportController::class, 'exportPdf'])->name('empleados.exportPdf');
-        Route::get('empleados/exportar-pdf', [EmpleadoController::class, 'exportarPdf'])->name('empleados.exportarPdf');
     });
 
     // Puestos, Beneficiarios, Vacaciones, Sucursales
@@ -53,10 +51,6 @@ Route::middleware(['auth'])->group(function () {
         'beneficiarios' => BeneficiarioController::class,
         'solicitudes-vacaciones' => SolicitudVacacionController::class,
         'sucursales' => SucursalController::class,
-    ]);
-
-    Route::resource('sucursales', SucursalController::class)->middleware('auth')->parameters([
-        'sucursales' => 'sucursal'  // Aquí decimos que el parámetro se llame "sucursal"
     ]);
 
     // Configuración avanzada (rol o permiso)
@@ -84,6 +78,4 @@ Route::resource('sucursales', SucursalController::class)->middleware('auth')->pa
     'sucursales' => 'sucursal'  // Aseguramos que Laravel use 'sucursal' como nombre del parámetro
 ]);
 
-Route::resource('sucursales', SucursalController::class)->middleware('auth');
-
-Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
+Route::put('/sucursales/{sucursal}', [SucursalController::class, 'update'])->name('sucursales.update');
