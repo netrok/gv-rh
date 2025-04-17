@@ -8,12 +8,22 @@ use Illuminate\Http\Request;
 class PuestoController extends Controller
 {
     // Mostrar todos los puestos
-    public function index()
-    {
-        $puestos = Puesto::all(); // Obtener todos los puestos
-        return view('puestos.index', compact('puestos'));
+    public function index(Request $request)
+{
+    $query = Puesto::query();
+
+    if ($request->filled('nombre')) {
+        $query->where('nombre_puesto', 'like', '%' . $request->nombre . '%');
     }
 
+    if ($request->filled('status')) {
+        $query->where('status_puesto', $request->status);
+    }
+
+    $puestos = $query->paginate(10); // <-- ¡ESTO es clave!
+
+    return view('puestos.index', compact('puestos'));
+}
     // Mostrar el formulario para crear un nuevo puesto
     public function create()
     {
@@ -53,7 +63,7 @@ class PuestoController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'nombre_puesto' => 'required|unique:tbl_puestos,nombre_puesto,' . $id,
+            'nombre_puesto' => 'required|unique:tbl_puestos,nombre_puesto,' . $id . ',id_puesto',
             'sueldo_base' => 'required|numeric',
             'jefe_directo' => 'required',
             'status_puesto' => 'required',
