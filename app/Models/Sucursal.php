@@ -17,7 +17,7 @@ class Sucursal extends Model
     // Definir los campos que se pueden asignar masivamente
     protected $fillable = [
         'nombre_sucursal', 'direccion', 'telefono_1', 'telefono_2', 
-        'celular', 'responsable', 'email_responsable', 'status_suursal'
+        'celular', 'responsable', 'email_responsable', 'status_sucursal'
     ];
 
     // Relación con empleados

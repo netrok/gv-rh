@@ -4,80 +4,107 @@ namespace App\Http\Controllers;
 
 use App\Models\Sucursal;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\SucursalesExport;
+use Barryvdh\DomPDF\Facade\Pdf;
+
 
 class SucursalController extends Controller
 {
+
+
+public function exportExcel()
+{
+    return Excel::download(new SucursalesExport, 'sucursales.xlsx');
+}
+
+public function exportPDF()
+{
+    $sucursales = Sucursal::all();
+    $pdf = Pdf::loadView('sucursales.pdf', compact('sucursales'));
+    return $pdf->download('sucursales.pdf');
+}
+
     // Mostrar todas las sucursales
-    public function index()
-    {
-        $sucursales = Sucursal::all(); // Obtener todas las sucursales
-        return view('sucursales.index', compact('sucursales'));
+    public function index(Request $request)
+{
+    $query = Sucursal::query();
+
+    if ($request->filled('nombre')) {
+        $query->where('nombre_sucursal', 'ilike', '%' . $request->nombre . '%');
     }
 
-    // Mostrar el formulario para crear una nueva sucursal
-    public function create()
-    {
-        return view('sucursales.create');
+    if ($request->filled('estado')) {
+        $query->where('status_sucursal', $request->estado);
     }
+
+    $sucursales = $query->orderBy('nombre_sucursal')->paginate(10)->withQueryString();
+
+    return view('sucursales.index', compact('sucursales'));
+}
+
+    // Mostrar el formulario para crear una nueva sucursal
+public function create()
+{
+    return view('sucursales.create');
+}
 
     // Almacenar una nueva sucursal en la base de datos
     public function store(Request $request)
     {
         $request->validate([
-            'nombre_sucursal' => 'required|unique:tbl_sucursales',
-            'direccion' => 'required',
-            'telefono_1' => 'required',
-            'telefono_2' => 'required',
-            'celular' => 'required',
-            'responsable' => 'required',
+            'nombre_sucursal' => 'required|string|max:255',
+            'direccion' => 'required|string',
+            'telefono_1' => 'required|string',
+            'telefono_2' => 'nullable|string',
+            'celular' => 'required|string',
+            'responsable' => 'required|string',
             'email_responsable' => 'required|email',
-            'status_suursal' => 'required',
+            'status_sucursal' => 'required|in:activo,inactivo',
         ]);
-
-        Sucursal::create($request->all()); // Crear la sucursal
-
-        return redirect()->route('sucursales.index')->with('success', 'Sucursal creada con éxito.');
+    
+        Sucursal::create($request->all());
+    
+        return redirect()->route('sucursales.index')->with('success', 'Sucursal creada correctamente.');
     }
 
     // Mostrar los detalles de una sucursal
-    public function show($id)
+    public function show(Sucursal $sucursal)
     {
-        $sucursal = Sucursal::findOrFail($id);
         return view('sucursales.show', compact('sucursal'));
     }
 
     // Mostrar el formulario para editar una sucursal
-    public function edit($id)
+    public function edit(Sucursal $sucursal)
     {
-        $sucursal = Sucursal::findOrFail($id);
         return view('sucursales.edit', compact('sucursal'));
     }
 
     // Actualizar una sucursal en la base de datos
-    public function update(Request $request, $id)
+    public function update(Request $request, Sucursal $sucursal)
     {
+        // Validación (puedes personalizarla según lo que necesites)
         $request->validate([
-            'nombre_sucursal' => 'required|unique:tbl_sucursales,nombre_sucursal,' . $id,
-            'direccion' => 'required',
-            'telefono_1' => 'required',
-            'telefono_2' => 'required',
-            'celular' => 'required',
-            'responsable' => 'required',
-            'email_responsable' => 'required|email',
-            'status_suursal' => 'required',
+            'nombre_sucursal' => 'required|string|max:255',
+            'direccion' => 'required|string|max:255',
+            'telefono_1' => 'required|string|max:15',
+            'telefono_2' => 'nullable|string|max:15',
         ]);
-
-        $sucursal = Sucursal::findOrFail($id);
-        $sucursal->update($request->all()); // Actualizar la sucursal
-
-        return redirect()->route('sucursales.index')->with('success', 'Sucursal actualizada con éxito.');
+    
+        // Actualizamos los campos
+        $sucursal->nombre_sucursal = $request->nombre_sucursal;
+        $sucursal->direccion = $request->direccion;
+        $sucursal->telefono_1 = $request->telefono_1;
+        $sucursal->telefono_2 = $request->telefono_2;
+    
+        $sucursal->save(); // Guardamos los cambios
+    
+        return redirect()->route('sucursales.index')->with('success', 'Sucursal actualizada correctamente');
     }
-
     // Eliminar una sucursal
-    public function destroy($id)
+    public function destroy(Sucursal $sucursal)
     {
-        $sucursal = Sucursal::findOrFail($id);
-        $sucursal->delete(); // Eliminar la sucursal
+        $sucursal->delete();
 
         return redirect()->route('sucursales.index')->with('success', 'Sucursal eliminada con éxito.');
     }

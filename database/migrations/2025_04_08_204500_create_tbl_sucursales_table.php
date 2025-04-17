@@ -17,7 +17,7 @@ class CreateTblSucursalesTable extends Migration
             $table->string('celular', 10);
             $table->string('responsable', 255);
             $table->string('email_responsable', 255);
-            $table->string('status_suursal', 10);
+            $table->string('status_sucursal', 20);
             $table->timestamps();
         });
     }

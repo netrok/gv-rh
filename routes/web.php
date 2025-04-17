@@ -9,8 +9,10 @@ use App\Http\Controllers\PuestoController;
 use App\Http\Controllers\RolePermissionController;
 use App\Http\Controllers\SolicitudVacacionController;
 use App\Http\Controllers\SucursalController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+
 
 // Página principal
 Route::get('/', fn () => view('welcome'));
@@ -22,7 +24,7 @@ Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('register', [RegisterController::class, 'register']);
 
-// Rutas protegidas
+// Rutas protegidas (requiere autenticación)
 Route::middleware(['auth'])->group(function () {
 
     // Roles y permisos
@@ -53,15 +55,35 @@ Route::middleware(['auth'])->group(function () {
         'sucursales' => SucursalController::class,
     ]);
 
-    // Configuración (rol o permiso)
+    Route::resource('sucursales', SucursalController::class)->middleware('auth')->parameters([
+        'sucursales' => 'sucursal'  // Aquí decimos que el parámetro se llame "sucursal"
+    ]);
+
+    // Configuración avanzada (rol o permiso)
     Route::get('/configuracion', fn () => 'Configuración avanzada')->middleware('role_or_permission:admin|editar empleados');
 });
 
-// Página de inicio
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+// Página de inicio (Dashboard)
+Route::get('/home', [DashboardController::class, 'index'])->name('home');
 
 // Rutas de autenticación estándar de Laravel
 Auth::routes();
 
+// Rutas adicionales para auditoría de empleados
 Route::get('empleados/{id}/audits', [EmpleadoController::class, 'showAudits']);
+
+// Dashboard (requiere estar autenticado)
 Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+// Rutas para exportar sucursales (excel, pdf)
+Route::get('sucursales/export/excel', [SucursalController::class, 'exportExcel'])->name('sucursales.export.excel');
+Route::get('sucursales/export/pdf', [SucursalController::class, 'exportPDF'])->name('sucursales.export.pdf');
+
+// Corregimos la ruta de recurso para sucursales (usamos el nombre correcto del parámetro)
+Route::resource('sucursales', SucursalController::class)->middleware('auth')->parameters([
+    'sucursales' => 'sucursal'  // Aseguramos que Laravel use 'sucursal' como nombre del parámetro
+]);
+
+Route::resource('sucursales', SucursalController::class)->middleware('auth');
+
+Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');

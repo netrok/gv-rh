@@ -1,12 +1,21 @@
 <?php
 
+namespace App\Http\Controllers;
+
 use App\Models\Empleado;
 
-public function index()
+class DashboardController extends Controller
 {
-    $empleadosCount = Empleado::count();
-    $empleadosActivosCount = Empleado::where('status', 'activo')->count();
-    $empleadosInactivosCount = Empleado::where('status', 'inactivo')->count();
+    public function index()
+    {
+        $empleadosCount = Empleado::count();
+        $empleadosActivosCount = Empleado::where('status', 'activo')->count();
+        $empleadosInactivosCount = Empleado::where('status', 'inactivo')->count();
 
-    return view('dashboard', compact('empleadosCount', 'empleadosActivosCount', 'empleadosInactivosCount'));
+        return view('dashboard.index', compact(
+            'empleadosCount',
+            'empleadosActivosCount',
+            'empleadosInactivosCount'
+        ));
+    }
 }
