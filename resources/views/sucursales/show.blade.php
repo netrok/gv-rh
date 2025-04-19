@@ -2,37 +2,65 @@
 
 @section('content')
 <div class="container">
-    <h1 class="mb-4">Detalle de la Sucursal</h1>
+    <h2 class="mb-4">Detalles de la Sucursal</h2>
 
-    <div class="card shadow rounded mb-4">
+    <div class="card shadow rounded">
         <div class="card-body">
-            <h4 class="card-title">{{ $sucursal->nombre_sucursal }}</h4>
-            <p class="mb-2"><strong>Dirección:</strong> {{ $sucursal->direccion }}</p>
-            <p class="mb-2"><strong>Teléfono 1:</strong> {{ $sucursal->telefono_1 }}</p>
-            <p class="mb-2"><strong>Teléfono 2:</strong> {{ $sucursal->telefono_2 ?? 'N/A' }}</p>
-            <p class="mb-2"><strong>Celular:</strong> {{ $sucursal->celular }}</p>
-            <p class="mb-2"><strong>Responsable:</strong> {{ $sucursal->responsable }}</p>
-            <p class="mb-2"><strong>Email del Responsable:</strong> {{ $sucursal->email_responsable }}</p>
-            <p class="mb-2">
-                <strong>Estado:</strong> 
-                <span class="badge {{ $sucursal->status_sucursal == 'activo' ? 'bg-success' : 'bg-danger' }}">
-                    {{ ucfirst($sucursal->status_sucursal) }}
-                </span>
-            </p>
-            <p class="text-muted"><small>Última actualización: {{ $sucursal->updated_at->format('d/m/Y H:i') }}</small></p>
-        </div>
-    </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <h5><strong>Nombre:</strong></h5>
+                    <p>{{ $sucursal->nombre_sucursal }}</p>
+                </div>
+                <div class="col-md-6">
+                    <h5><strong>Dirección:</strong></h5>
+                    <p>{{ $sucursal->direccion }}</p>
+                </div>
+                <div class="col-md-4">
+                    <h5><strong>Teléfono 1:</strong></h5>
+                    <p>{{ $sucursal->telefono_1 }}</p>
+                </div>
+                <div class="col-md-4">
+                    <h5><strong>Teléfono 2:</strong></h5>
+                    <p>{{ $sucursal->telefono_2 }}</p>
+                </div>
+                <div class="col-md-4">
+                    <h5><strong>Celular:</strong></h5>
+                    <p>{{ $sucursal->celular }}</p>
+                </div>
+                <div class="col-md-6">
+                    <h5><strong>Responsable:</strong></h5>
+                    <p>{{ $sucursal->responsable }}</p>
+                </div>
+                <div class="col-md-6">
+                    <h5><strong>Email Responsable:</strong></h5>
+                    <p>{{ $sucursal->email_responsable }}</p>
+                </div>
+                <div class="col-md-3">
+                    <h5><strong>Estado:</strong></h5>
+                    <span class="badge bg-{{ $sucursal->status_sucursal == 'activo' ? 'success' : 'secondary' }}">
+                        {{ ucfirst($sucursal->status_sucursal) }}
+                    </span>
+                </div>
+            </div>
 
-    <div class="d-flex justify-content-between">
-        <a href="{{ route('sucursales.index') }}" class="btn btn-secondary">Volver al listado</a>
-        <div>
-            <a href="{{ route('sucursales.edit', $sucursal) }}" class="btn btn-primary me-2">Editar</a>
-            <form action="{{ route('sucursales.destroy', $sucursal) }}" method="POST" class="d-inline"
-                  onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta sucursal?');">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="btn btn-danger">Eliminar</button>
-            </form>
+            <div class="d-flex justify-content-between">
+                <a href="{{ route('sucursales.index') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </a>
+                <div>
+                    <a href="{{ route('sucursales.edit', $sucursal->id_sucursal) }}" class="btn btn-primary me-2">
+                        <i class="fas fa-edit"></i> Editar
+                    </a>
+                    <form action="{{ route('sucursales.destroy', $sucursal->id_sucursal) }}" method="POST" class="d-inline"
+                          onsubmit="return confirm('¿Estás seguro de eliminar esta sucursal?')">
+                        @csrf
+                        @method('DELETE')
+                        <button class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </div>
