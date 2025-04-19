@@ -11,6 +11,9 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\EmpleadosExport;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+
+
 
 class EmpleadoController extends Controller
 {
@@ -45,7 +48,6 @@ class EmpleadoController extends Controller
         return Excel::download(new EmpleadosExport, 'empleados.xlsx');
     }
 
-    // Exporta a PDF 1 empleado
     public function exportPDF()
     {
         $empleados = Empleado::select('num_empleado', 'nombres', 'apellidos', 'email')->get();
@@ -53,27 +55,21 @@ class EmpleadoController extends Controller
         return $pdf->download('empleados.pdf');
     }
 
-    // Exporta a PDF todos los empleados
-
     public function exportarPdf()
     {
-        // Obtener todos los empleados
         $empleados = Empleado::all();
-
-        // Generar el PDF con todos los empleados
         $pdf = PDF::loadView('empleados.exportar-pdf', compact('empleados'));
-
-        // Descargar o mostrar el PDF
         return $pdf->stream('empleados.pdf');
     }
 
-
     public function create()
     {
-        $puestos = Puesto::all();
-        $sucursales = Sucursal::all();
+        $puestos = Puesto::all(['id_puesto', 'nombre_puesto']);
+        $sucursales = Sucursal::all(['id_sucursal', 'nombre_sucursal']);
+    
         return view('empleados.create', compact('puestos', 'sucursales'));
     }
+    
 
     public function store(Request $request)
     {
@@ -109,13 +105,13 @@ class EmpleadoController extends Controller
     }
 
     public function edit($id)
-    {
-        $empleado = Empleado::with(['puesto', 'sucursal'])->findOrFail($id);
-        $puestos = Puesto::all();
-        $sucursales = Sucursal::all();
+{
+    $empleado = Empleado::findOrFail($id);
+    $puestos = Puesto::all(['id_puesto', 'nombre_puesto']);
+    $sucursales = Sucursal::all(['id_sucursal', 'nombre_sucursal']);
 
-        return view('empleados.edit', compact('empleado', 'puestos', 'sucursales'));
-    }
+    return view('empleados.edit', compact('empleado', 'puestos', 'sucursales'));
+}
 
     public function update(Request $request, $id)
     {
@@ -186,5 +182,4 @@ class EmpleadoController extends Controller
         $audits = Audit::where('id_empleado', $id)->get();
         return view('empleados.audits', compact('audits'));
     }
-
 }
