@@ -15,8 +15,8 @@ class AuditController extends Controller
     {
         $query = Audit::query()->with('empleado')->orderBy('created_at', 'desc');
 
-        if ($request->filled('empleado_id')) {
-            $query->where('empleado_id', $request->empleado_id);
+        if ($request->filled('id_empleado')) {
+            $query->where('id_empleado', $request->id_empleado);
         }
 
         if ($request->filled('desde')) {
@@ -51,8 +51,8 @@ class AuditController extends Controller
     $query = Audit::query()->latest(); // O cualquier filtro por defecto que necesites
 
     // Filtrado por empleado
-    if ($request->filled('empleado_id')) {
-        $query->where('empleado_id', $request->empleado_id);
+    if ($request->filled('id_empleado')) {
+        $query->where('id_empleado', $request->id_empleado);
     }
 
     // Filtrado por fecha de inicio

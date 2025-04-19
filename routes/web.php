@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\DashboardController;
@@ -15,8 +14,7 @@ use App\Http\Controllers\SucursalController;
 use App\Http\Controllers\SolicitudVacacionController;
 use App\Http\Controllers\AuditController;
 
-
-// Página de bienvenida
+// ------------------- Página de bienvenida -------------------
 Route::get('/', fn() => view('welcome'));
 
 // ------------------- Autenticación -------------------
@@ -28,6 +26,9 @@ Route::get('register', [RegisterController::class, 'showRegistrationForm'])->nam
 Route::post('register', [RegisterController::class, 'register']);
 
 Auth::routes(); // Rutas por defecto de Laravel
+
+// ------------------- Acceso público -------------------
+Route::get('beneficiarios/{id}/pdf', [BeneficiarioController::class, 'generarPdf'])->name('beneficiarios.generarPdf');
 
 // ------------------- Área Protegida -------------------
 Route::middleware(['auth'])->group(function () {
@@ -45,7 +46,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // ----------- Empleados -----------
-    Route::middleware(['role:admin'])->group(function () {
+    Route::middleware('role:admin')->group(function () {
         Route::resource('empleados', EmpleadoController::class)->except(['show']);
         Route::get('empleados/{id_empleado}/pdf', [EmpleadoController::class, 'generarPdf'])->name('empleados.pdf');
         Route::get('empleados/{id}/audits', [EmpleadoController::class, 'showAudits'])->name('empleados.audits');
@@ -56,14 +57,13 @@ Route::middleware(['auth'])->group(function () {
         Route::get('empleados/exportar-pdf', [EmpleadoController::class, 'exportarPdf'])->name('empleados.exportarPdf');
     });
 
-    // Visualización individual para admin y empleado
-    Route::middleware(['role:admin|empleado'])->group(function () {
+    // Visualización individual (admin y empleado)
+    Route::middleware('role:admin|empleado')->group(function () {
         Route::get('empleados/{id_empleado}/show', [EmpleadoController::class, 'show'])->name('empleados.show');
     });
 
     // ----------- Módulos de Gestión (solo admin) -----------
-    Route::middleware(['role:admin'])->group(function () {
-
+    Route::middleware('role:admin')->group(function () {
         Route::resources([
             'puestos' => PuestoController::class,
             'beneficiarios' => BeneficiarioController::class,
@@ -76,27 +76,17 @@ Route::middleware(['auth'])->group(function () {
         Route::get('sucursales/export/pdf', [SucursalController::class, 'exportPDF'])->name('sucursales.export.pdf');
 
         // Actualización explícita de sucursales
-        Route::put('/sucursales/{sucursal}', [SucursalController::class, 'update'])->name('sucursales.update');
+        Route::put('sucursales/{sucursal}', [SucursalController::class, 'update'])->name('sucursales.update');
     });
 
     // ----------- Configuración avanzada -----------
     Route::get('/configuracion', fn() => 'Configuración avanzada')
         ->middleware('role_or_permission:admin|editar empleados');
+
+    // ----------- Auditorías (usuarios con permiso) -----------
+    Route::middleware('can:ver auditorias')->group(function () {
+        Route::get('/auditorias', [AuditController::class, 'index'])->name('auditorias.index');
+        Route::get('/auditorias/export/excel', [AuditController::class, 'export'])->name('auditorias.export');
+        Route::get('/auditorias/export/pdf', [AuditController::class, 'exportPdf'])->name('auditorias.export.pdf');
+    });
 });
-
-// ----------- Acceso público para exportar PDF de beneficiarios -----------
-Route::get('beneficiarios/{id}/pdf', [BeneficiarioController::class, 'generarPdf'])->name('beneficiarios.generarPdf');
-
-// ----------- Auditorías (solo usuarios con permisos) -----------
-Route::middleware(['can:ver auditorias'])->group(function () {
-    Route::get('/auditorias', [AuditController::class, 'index'])->name('auditorias.index');
-    Route::get('/auditorias/export/excel', [AuditController::class, 'exportExcel'])->name('auditorias.export.excel');
-    Route::get('/auditorias/export/pdf', [AuditController::class, 'exportPdf'])->name('auditorias.export.pdf');
-});
-
-Route::get('/auditorias', [AuditController::class, 'index'])->name('auditorias.index')->middleware('can:ver auditorias');
-
-
-
-Route::get('/auditorias/export', [AuditController::class, 'export'])->name('auditorias.export');
-Route::get('/auditorias/export/pdf', [AuditController::class, 'exportPdf'])->name('auditorias.export.pdf');
