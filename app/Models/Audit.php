@@ -14,4 +14,12 @@ class Audit extends Model
     protected $casts = [
         'changed_data' => 'array',
     ];
+
+    public function empleado()
+    {
+        return $this->belongsTo(Empleado::class, 'id_empleado', 'id_empleado');
+    }
+    
 }
+
+

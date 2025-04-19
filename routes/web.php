@@ -13,9 +13,11 @@ use App\Http\Controllers\BeneficiarioController;
 use App\Http\Controllers\PuestoController;
 use App\Http\Controllers\SucursalController;
 use App\Http\Controllers\SolicitudVacacionController;
+use App\Http\Controllers\AuditController;
+
 
 // Página de bienvenida
-Route::get('/', fn () => view('welcome'));
+Route::get('/', fn() => view('welcome'));
 
 // ------------------- Autenticación -------------------
 Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -78,9 +80,23 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // ----------- Configuración avanzada -----------
-    Route::get('/configuracion', fn () => 'Configuración avanzada')
+    Route::get('/configuracion', fn() => 'Configuración avanzada')
         ->middleware('role_or_permission:admin|editar empleados');
 });
 
 // ----------- Acceso público para exportar PDF de beneficiarios -----------
 Route::get('beneficiarios/{id}/pdf', [BeneficiarioController::class, 'generarPdf'])->name('beneficiarios.generarPdf');
+
+// ----------- Auditorías (solo usuarios con permisos) -----------
+Route::middleware(['can:ver auditorias'])->group(function () {
+    Route::get('/auditorias', [AuditController::class, 'index'])->name('auditorias.index');
+    Route::get('/auditorias/export/excel', [AuditController::class, 'exportExcel'])->name('auditorias.export.excel');
+    Route::get('/auditorias/export/pdf', [AuditController::class, 'exportPdf'])->name('auditorias.export.pdf');
+});
+
+Route::get('/auditorias', [AuditController::class, 'index'])->name('auditorias.index')->middleware('can:ver auditorias');
+
+
+
+Route::get('/auditorias/export', [AuditController::class, 'export'])->name('auditorias.export');
+Route::get('/auditorias/export/pdf', [AuditController::class, 'exportPdf'])->name('auditorias.export.pdf');
