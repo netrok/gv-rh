@@ -5,101 +5,153 @@
     <title>Reporte de Empleados</title>
     <style>
         body {
-            font-family: DejaVu Sans, sans-serif;
-            margin: 0 40px;
+            font-family: Arial, sans-serif;
             font-size: 12px;
-            color: #333;
+            color: #2c3e50;
+            padding: 30px;
         }
-        header {
+
+        .header {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #007BFF;
+            align-items: center;
+            border-bottom: 3px solid #2c3e50;
             padding-bottom: 10px;
+            margin-bottom: 20px;
         }
-        header img {
-            height: 60px;
+
+        .logo {
+            width: 100px;
         }
-        header h1 {
-            font-size: 24px;
+
+        .empresa-info {
+            text-align: right;
+        }
+
+        .empresa-info h1 {
             margin: 0;
-            color: #007BFF;
+            font-size: 18px;
+            color: #2c3e50;
         }
-        .meta {
-            font-size: 12px;
-            margin-top: 10px;
-            color: #666;
+
+        .empresa-info p {
+            margin: 0;
+            font-size: 11px;
         }
-        table {
+
+        .titulo {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .tabla-empleados {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 10px;
         }
-        th {
-            background-color: #007BFF;
-            color: white;
-            padding: 8px;
+
+        .tabla-empleados th,
+        .tabla-empleados td {
+            padding: 8px 10px;
             text-align: left;
-        }
-        td {
-            padding: 8px;
             border-bottom: 1px solid #ccc;
         }
+
+        .tabla-empleados th {
+            background-color: #2c3e50;
+            color: white;
+        }
+
+        .status-activo {
+            color: green;
+            font-weight: bold;
+        }
+
+        .status-inactivo {
+            color: #aaa;
+            font-weight: bold;
+        }
+
         .footer {
-            position: absolute;
-            bottom: 30px;
-            right: 40px;
+            margin-top: 40px;
+            text-align: center;
             font-size: 10px;
-            color: #888;
+            color: #999;
+        }
+
+        .watermark {
+            position: fixed;
+            top: 40%;
+            left: 25%;
+            font-size: 60px;
+            color: rgba(200, 200, 200, 0.15);
+            transform: rotate(-30deg);
+            z-index: 0;
+            font-weight: bold;
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
 
-<header>
-    <img src="{{ public_path('images/logo_empresa.png') }}" alt="Logo">
-    <h1>Reporte de Empleados</h1>
-</header>
+    <div class="watermark">CONFIDENCIAL</div>
 
-<div class="meta">
-    Generado por: {{ Auth::user()->name ?? 'Administrador' }}<br>
-    Fecha: {{ \Carbon\Carbon::now()->format('d/m/Y H:i') }}
-</div>
+    <div class="header">
+        <img src="{{ public_path('images/logo.png') }}" class="logo" alt="Logo">
+        <div class="empresa-info">
+            <h1>Nombre de la Empresa</h1>
+            <p>Reporte General de Empleados</p>
+            <p>Generado por: {{ Auth::user()->name ?? 'Administrador' }}</p>
+            <p>Fecha: {{ \Carbon\Carbon::now()->format('d/m/Y H:i') }}</p>
+        </div>
+    </div>
 
-<table>
-    <thead>
-        <tr>
-            <th>Número</th>
-            <th>Nombres</th>
-            <th>Apellidos</th>
-            <th>Email</th>
-            <th>Status</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach ($empleados as $empleado)
+    <div class="titulo">Listado de Empleados</div>
+
+    <table class="tabla-empleados">
+        <thead>
             <tr>
-                <td>{{ $empleado->num_empleado }}</td>
-                <td>{{ $empleado->nombres }}</td>
-                <td>{{ $empleado->apellidos }}</td>
-                <td>{{ $empleado->email }}</td>
-                <td>{{ ucfirst($empleado->status) }}</td>
+                <th>#</th>
+                <th>Número</th>
+                <th>Nombres</th>
+                <th>Apellidos</th>
+                <th>Email</th>
+                <th>Status</th>
             </tr>
-        @endforeach
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach ($empleados as $index => $empleado)
+                <tr>
+                    <td>{{ $index + 1 }}</td>
+                    <td>{{ $empleado->num_empleado }}</td>
+                    <td>{{ $empleado->nombres }}</td>
+                    <td>{{ $empleado->apellidos }}</td>
+                    <td>{{ $empleado->email }}</td>
+                    <td class="{{ $empleado->status == 'activo' ? 'status-activo' : 'status-inactivo' }}">
+                        {{ ucfirst($empleado->status) }}
+                    </td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
 
-{{-- Numeración de páginas --}}
-@if (isset($pdf))
-    <script type="text/php">
-        if (isset($pdf)) {
-            $pdf->page_script(function($pageNumber, $pageCount, $pdf) {
-                $pdf->text(500, 820, "Página $pageNumber de $pageCount", null, 10);
-            });
-        }
-    </script>
-@endif
+    {{-- Numeración de páginas --}}
+    @if (isset($pdf))
+        <script type="text/php">
+            if (isset($pdf)) {
+                $pdf->page_script(function($pageNumber, $pageCount, $pdf) {
+                    $pdf->text(500, 820, "Página $pageNumber de $pageCount", null, 10);
+                });
+            }
+        </script>
+    @endif
+
+    <div class="footer">
+        Documento confidencial. Generado automáticamente por el sistema de gestión de empleados.
+    </div>
 
 </body>
 </html>

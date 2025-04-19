@@ -58,26 +58,28 @@ class Empleado extends Model
     }
 
     public static function boot()
-    {
-        parent::boot();
+{
+    parent::boot();
 
-        static::updated(function ($empleado) {
-            $changes = $empleado->getChanges();
-            Audit::create([
-                'id_empleado' => $empleado->id_empleado,
-                'action' => 'updated',
-                'changed_data' => json_encode($changes),
-            ]);
-        });
+    static::updated(function ($empleado) {
+        $changes = $empleado->getChanges();
 
-        static::deleted(function ($empleado) {
-            Audit::create([
-                'id_empleado' => $empleado->id_empleado,
-                'action' => 'deleted',
-                'changed_data' => json_encode($empleado->getOriginal()),
-            ]);
-        });
-    }
+        Audit::create([
+            'id_empleado' => $empleado->id_empleado,
+            // 👇 Aquí está el campo problemático
+            'accion' => 'updated',
+            'changed_data' => json_encode($changes),
+        ]);
+    });
 
-    
+    static::deleted(function ($empleado) {
+        Audit::create([
+            'id_empleado' => $empleado->id_empleado,
+            'accion' => 'deleted',
+            'changed_data' => json_encode($empleado->getOriginal()),
+        ]);
+    });
+}
+
+
 }

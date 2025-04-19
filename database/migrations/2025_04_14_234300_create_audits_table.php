@@ -1,29 +1,27 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+namespace App\Models;
 
-return new class extends Migration {
-    /**
-     * Run the migrations.
-     */
-   // database/migrations/2025_04_14_234300_create_audits_table.php
-public function up()
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Audit extends Model
 {
-    Schema::create('audits', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('id_empleado'); // solo la columna
-        $table->text('accion');
-        $table->timestamps();
-    });
-}
+    use HasFactory;
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    protected $fillable = [
+        'id_empleado',
+        'accion',
+        'changed_data',
+    ];
+
+    protected $casts = [
+        'changed_data' => 'array',
+    ];
+
+    // Relación con el modelo de Empleado (opcional pero recomendable)
+    public function empleado()
     {
-        Schema::dropIfExists('audits');
+        return $this->belongsTo(Empleado::class, 'id_empleado', 'id_empleado');
     }
-};
+}

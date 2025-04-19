@@ -11,7 +11,16 @@ class AddForeignKeyToAuditsTable extends Migration
     public function up()
     {
         Schema::table('audits', function (Blueprint $table) {
-            // Aquí agregas la clave foránea para la tabla audits
+            // Verificar si la restricción de clave foránea ya existe antes de agregarla
+            if (!Schema::hasColumn('audits', 'id_empleado')) {
+                $table->unsignedBigInteger('id_empleado')->nullable();
+            }
+            
+            // Agregar la clave foránea solo si no existe
+            if (!Schema::hasTable('tbl_empleados')) {
+                return;
+            }
+            
             $table->foreign('id_empleado')->references('id_empleado')->on('tbl_empleados')->onDelete('cascade');
         });
     }
@@ -22,6 +31,7 @@ class AddForeignKeyToAuditsTable extends Migration
     public function down()
     {
         Schema::table('audits', function (Blueprint $table) {
+            // Eliminar la clave foránea si existe
             $table->dropForeign(['id_empleado']);
         });
     }
