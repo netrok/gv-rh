@@ -1,34 +1,56 @@
-<!-- resources/views/puestos/edit.blade.php -->
-
 @extends('layouts.app')
 
 @section('content')
     <div class="container">
-        <h1>Editar Puesto</h1>
+        <h1 class="mb-4">Editar Puesto</h1>
         
         <form action="{{ route('puestos.update', $puesto->id_puesto) }}" method="POST">
             @csrf
             @method('PUT')
-            <div class="form-group">
-                <label for="nombre_puesto">Nombre del Puesto</label>
-                <input type="text" class="form-control" id="nombre_puesto" name="nombre_puesto" value="{{ $puesto->nombre_puesto }}" required>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label for="nombre_puesto" class="form-label">Nombre del Puesto</label>
+                        <input type="text" class="form-control" id="nombre_puesto" name="nombre_puesto" value="{{ old('nombre_puesto', $puesto->nombre_puesto) }}" required>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label for="sueldo_base" class="form-label">Sueldo Base</label>
+                        <input type="number" class="form-control" id="sueldo_base" name="sueldo_base" value="{{ old('sueldo_base', $puesto->sueldo_base) }}" step="0.01" required>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="sueldo_base">Sueldo Base</label>
-                <input type="number" class="form-control" id="sueldo_base" name="sueldo_base" value="{{ $puesto->sueldo_base }}" step="0.01" required>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label for="jefe_directo" class="form-label">Jefe Directo</label>
+                        <input type="text" class="form-control" id="jefe_directo" name="jefe_directo" value="{{ old('jefe_directo', $puesto->jefe_directo) }}" required>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label for="status_puesto" class="form-label">Status del Puesto</label>
+                        <select class="form-select" id="status_puesto" name="status_puesto" required>
+                            <option value="activo" {{ old('status_puesto', $puesto->status_puesto) == 'activo' ? 'selected' : '' }}>Activo</option>
+                            <option value="inactivo" {{ old('status_puesto', $puesto->status_puesto) == 'inactivo' ? 'selected' : '' }}>Inactivo</option>
+                        </select>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="jefe_directo">Jefe Directo</label>
-                <input type="text" class="form-control" id="jefe_directo" name="jefe_directo" value="{{ $puesto->jefe_directo }}" required>
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-edit"></i> Actualizar Puesto
+                </button>
+                <a href="{{ route('puestos.index') }}" class="btn btn-secondary ms-2">
+                    <i class="fas fa-undo"></i> Cancelar
+                </a>
             </div>
-            <div class="form-group">
-                <label for="status_puesto">Status del Puesto</label>
-                <select class="form-control" id="status_puesto" name="status_puesto" required>
-                    <option value="activo" {{ $puesto->status_puesto == 'activo' ? 'selected' : '' }}>Activo</option>
-                    <option value="inactivo" {{ $puesto->status_puesto == 'inactivo' ? 'selected' : '' }}>Inactivo</option>
-                </select>
-            </div>
-            <button type="submit" class="btn btn-primary">Actualizar Puesto</button>
         </form>
     </div>
 @endsection

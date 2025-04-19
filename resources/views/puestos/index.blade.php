@@ -2,88 +2,94 @@
 
 @section('content')
 <div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="mb-0">Listado de Puestos</h1>
-        <a href="{{ route('puestos.create') }}" class="btn btn-success">
-            <i class="fas fa-plus-circle"></i> Nuevo Puesto
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-bold text-primary">💼 Listado de Puestos</h1>
+        <a href="{{ route('puestos.create') }}" class="btn btn-success shadow">
+            <i class="fas fa-plus me-1"></i> Nuevo Puesto
         </a>
     </div>
 
+    @if(session('success'))
+        <div class="alert alert-success shadow-sm">{{ session('success') }}</div>
+    @endif
+
     <!-- Filtros -->
-    <form method="GET" action="{{ route('puestos.index') }}" class="row g-3 mb-4">
-        <div class="col-md-4">
-            <input type="text" name="nombre" value="{{ request('nombre') }}" class="form-control" placeholder="Buscar por nombre">
-        </div>
-        <div class="col-md-3">
-            <select name="status" class="form-select">
-                <option value="">-- Todos los estados --</option>
-                <option value="activo" {{ request('status') == 'activo' ? 'selected' : '' }}>Activo</option>
-                <option value="inactivo" {{ request('status') == 'inactivo' ? 'selected' : '' }}>Inactivo</option>
-            </select>
-        </div>
-        <div class="col-md-2">
-            <button type="submit" class="btn btn-primary w-100">
-                <i class="fas fa-search"></i> Buscar
-            </button>
-        </div>
-        <div class="col-md-2">
-            <a href="{{ route('puestos.index') }}" class="btn btn-outline-secondary w-100">
-                <i class="fas fa-undo"></i> Reset
-            </a>
+    <form method="GET" class="card p-3 mb-4 shadow-sm">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">Nombre del Puesto</label>
+                <input type="text" name="nombre" class="form-control" placeholder="Buscar por nombre..." value="{{ request('nombre') }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Estado</label>
+                <select name="status" class="form-select">
+                    <option value="">-- Estado --</option>
+                    <option value="activo" {{ request('status') == 'activo' ? 'selected' : '' }}>Activo</option>
+                    <option value="inactivo" {{ request('status') == 'inactivo' ? 'selected' : '' }}>Inactivo</option>
+                </select>
+            </div>
+            <div class="col-md-5 d-flex gap-2">
+                <button class="btn btn-primary w-100">
+                    <i class="fas fa-filter me-1"></i> Filtrar
+                </button>
+                <a href="{{ route('puestos.index') }}" class="btn btn-outline-secondary w-100">
+                    <i class="fas fa-sync-alt me-1"></i> Limpiar
+                </a>
+            </div>
         </div>
     </form>
 
-    @if ($puestos->count())
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-dark">
+    <!-- Tabla -->
+    <div class="table-responsive shadow-sm">
+        <table class="table table-hover table-bordered align-middle">
+            <thead class="table-primary">
+                <tr class="text-center">
+                    <th>#</th>
+                    <th>Nombre del Puesto</th>
+                    <th>Sueldo Base</th>
+                    <th>Jefe Directo</th>
+                    <th>Status</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($puestos as $puesto)
                     <tr>
-                        <th>ID</th>
-                        <th>Nombre del Puesto</th>
-                        <th>Sueldo Base</th>
-                        <th>Jefe Directo</th>
-                        <th>Status</th>
-                        <th class="text-center">Acciones</th>
+                        <td class="text-center">{{ $loop->iteration + ($puestos->currentPage() - 1) * $puestos->perPage() }}</td>
+                        <td>{{ $puesto->nombre_puesto }}</td>
+                        <td>${{ number_format($puesto->sueldo_base, 2) }}</td>
+                        <td>{{ $puesto->jefe_directo }}</td>
+                        <td class="text-center">
+                            <span class="badge rounded-pill bg-{{ $puesto->status_puesto === 'activo' ? 'success' : 'secondary' }}">
+                                {{ ucfirst($puesto->status_puesto) }}
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <a href="{{ route('puestos.edit', $puesto->id_puesto) }}" class="btn btn-sm btn-outline-primary me-1">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form action="{{ route('puestos.destroy', $puesto->id_puesto) }}" method="POST"
+                                  style="display:inline-block;" onsubmit="return confirm('¿Estás seguro de eliminar este puesto?')">
+                                @csrf
+                                @method('DELETE')
+                                <button class="btn btn-sm btn-outline-danger">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </form>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    @foreach($puestos as $puesto)
-                        <tr>
-                            <td>{{ $puesto->id_puesto }}</td>
-                            <td>{{ $puesto->nombre_puesto }}</td>
-                            <td>${{ number_format($puesto->sueldo_base, 2) }}</td>
-                            <td>{{ $puesto->jefe_directo }}</td>
-                            <td>
-                                <span class="badge bg-{{ $puesto->status_puesto == 'activo' ? 'success' : 'secondary' }}">
-                                    {{ ucfirst($puesto->status_puesto) }}
-                                </span>
-                            </td>
-                            <td class="text-center">
-                                <a href="{{ route('puestos.edit', $puesto->id_puesto) }}" class="btn btn-sm btn-warning me-1">
-                                    <i class="fas fa-edit"></i> Editar
-                                </a>
-                                <form action="{{ route('puestos.destroy', $puesto->id_puesto) }}" method="POST" class="d-inline-block" onsubmit="return confirm('¿Estás seguro de eliminar este puesto?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger">
-                                        <i class="fas fa-trash-alt"></i> Eliminar
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+                @empty
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">No hay puestos registrados.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
 
-        <!-- Paginación -->
-        <div class="d-flex justify-content-center mt-3">
-            {{ $puestos->appends(request()->query())->links() }}
-        </div>
-    @else
-        <div class="alert alert-info">
-            No se encontraron puestos.
-        </div>
-    @endif
+    <!-- Paginación -->
+    <div class="d-flex justify-content-center mt-4">
+        {{ $puestos->links() }}
+    </div>
 </div>
 @endsection
