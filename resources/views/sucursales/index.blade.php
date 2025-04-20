@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
+<div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="fw-bold text-primary">📍 Listado de Sucursales</h1>
         <a href="{{ route('sucursales.create') }}" class="btn btn-success shadow">
@@ -84,14 +84,13 @@
                             </span>
                         </td>
                         <td class="text-center">
-                            <a href="{{ route('sucursales.edit', $sucursal->id_sucursal) }}" class="btn btn-sm btn-outline-primary me-1">
+                            <a href="{{ route('sucursales.edit', $sucursal->id_sucursal) }}" class="btn btn-sm btn-outline-primary me-1" title="Editar">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <form action="{{ route('sucursales.destroy', $sucursal->id_sucursal) }}" method="POST"
-                                  style="display:inline-block;" onsubmit="return confirm('¿Estás seguro de eliminar esta sucursal?')">
+                            <form action="{{ route('sucursales.destroy', $sucursal->id_sucursal) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Estás seguro de eliminar esta sucursal?')">
                                 @csrf
                                 @method('DELETE')
-                                <button class="btn btn-sm btn-outline-danger">
+                                <button class="btn btn-sm btn-outline-danger" title="Eliminar">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
                             </form>

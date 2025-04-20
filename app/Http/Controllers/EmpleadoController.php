@@ -13,8 +13,6 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 
-
-
 class EmpleadoController extends Controller
 {
     public function index(Request $request)
@@ -24,8 +22,8 @@ class EmpleadoController extends Controller
         // Filtros
         if ($request->filled('nombre')) {
             $query->where(function ($q) use ($request) {
-                $q->where('nombres', 'like', '%' . $request->nombre . '%')
-                    ->orWhere('apellidos', 'like', '%' . $request->nombre . '%');
+                $q->where('nombres', 'ILIKE', '%' . $request->nombre . '%')
+                  ->orWhere('apellidos', 'ILIKE', '%' . $request->nombre . '%');
             });
         }
 
@@ -37,7 +35,11 @@ class EmpleadoController extends Controller
             $query->where('status', $request->status);
         }
 
-        $empleados = $query->paginate(10)->withQueryString();
+        // Ordenar por número de empleado
+        $empleados = $query->orderBy('num_empleado', 'asc')
+            ->paginate(10)
+            ->appends($request->only(['nombre', 'status', 'sucursal']));
+
         $sucursales = Sucursal::all();
 
         return view('empleados.index', compact('empleados', 'sucursales'));
@@ -69,12 +71,11 @@ class EmpleadoController extends Controller
     
         return view('empleados.create', compact('puestos', 'sucursales'));
     }
-    
 
     public function store(Request $request)
     {
         $request->validate([
-            'num_empleado' => 'required|integer|unique:tbl_empleados,num_empleado',
+            'num_empleado' => 'required|regex:/^EMP[0-9]+$/|unique:tbl_empleados,num_empleado',            
             'nombres' => 'required|string|max:150',
             'apellidos' => 'required|string|max:150',
             'domicilio' => 'required|string|max:255',
@@ -105,20 +106,20 @@ class EmpleadoController extends Controller
     }
 
     public function edit($id)
-{
-    $empleado = Empleado::findOrFail($id);
-    $puestos = Puesto::all(['id_puesto', 'nombre_puesto']);
-    $sucursales = Sucursal::all(['id_sucursal', 'nombre_sucursal']);
+    {
+        $empleado = Empleado::findOrFail($id);
+        $puestos = Puesto::all(['id_puesto', 'nombre_puesto']);
+        $sucursales = Sucursal::all(['id_sucursal', 'nombre_sucursal']);
 
-    return view('empleados.edit', compact('empleado', 'puestos', 'sucursales'));
-}
+        return view('empleados.edit', compact('empleado', 'puestos', 'sucursales'));
+    }
 
     public function update(Request $request, $id)
     {
         $empleado = Empleado::findOrFail($id);
 
         $request->validate([
-            'num_empleado' => 'required|integer|unique:tbl_empleados,num_empleado,' . $id . ',id_empleado',
+            'num_empleado' => 'required|regex:/^EMP[0-9]+$/|unique:tbl_empleados,num_empleado,' . $id . ',id_empleado',
             'nombres' => 'required|string|max:150',
             'apellidos' => 'required|string|max:150',
             'domicilio' => 'required|string|max:255',

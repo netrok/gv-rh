@@ -102,9 +102,16 @@
         </table>
     </div>
 
-    <!-- Paginación -->
-    <div class="d-flex justify-content-center mt-4">
-        {{ $empleados->links('pagination::bootstrap-5') }}
-    </div>
+    <!-- Paginación con texto adicional -->
+    @if ($empleados->total() > 0)
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <div class="text-muted">
+                Mostrando <strong>{{ $empleados->firstItem() }}</strong> a <strong>{{ $empleados->lastItem() }}</strong> de <strong>{{ $empleados->total() }}</strong> resultados
+            </div>
+            <div>
+                {{ $empleados->links('pagination::bootstrap-5') }}
+            </div>
+        </div>
+    @endif
 </div>
 @endsection
