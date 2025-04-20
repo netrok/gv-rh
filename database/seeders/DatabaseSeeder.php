@@ -33,7 +33,10 @@ class DatabaseSeeder extends Seeder
         $adminRole->syncPermissions(Permission::all());
 
         $userRole = Role::firstOrCreate(['name' => 'user']);
-        $userRole->syncPermissions(['ver empleados', 'ver beneficiarios']);
+        $userRole->syncPermissions([
+            'ver empleados',
+            'ver beneficiarios'
+        ]);
 
         // Crear usuario admin
         $admin = User::firstOrCreate(
@@ -45,5 +48,13 @@ class DatabaseSeeder extends Seeder
         );
 
         $admin->assignRole('admin');
+
+        // Ejecutar los demás seeders
+        $this->call([
+            SucursalesTableSeeder::class,
+            PuestosTableSeeder::class,
+            EmpleadosTableSeeder::class,
+            BeneficiariosTableSeeder::class,
+        ]);
     }
 }
