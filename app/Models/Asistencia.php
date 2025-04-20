@@ -12,7 +12,7 @@ class Asistencia extends Model
     protected $table = 'asistencias';
 
     protected $fillable = [
-        'num_empleado',
+        'empleado_id',
         'fecha',
         'hora_entrada',
         'hora_salida',

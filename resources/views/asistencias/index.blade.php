@@ -1,57 +1,49 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container">
-        <h2>Registrar Asistencia</h2>
-
-        <!-- Mostrar el mensaje de éxito -->
-        @if(session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
-
-        <form action="{{ route('asistencias.store') }}" method="POST">
-            @csrf
-
-            <div class="form-group">
-                <label for="num_empleado">Empleado</label>
-                <select class="form-control" name="num_empleado" required>
-                    <option value="">Selecciona un empleado</option>
-                    @foreach ($empleados as $empleado)
-                        <option value="{{ $empleado->num_empleado }}">{{ $empleado->num_empleado }} - {{ $empleado->nombres }} {{ $empleado->apellidos }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="fecha">Fecha</label>
-                <input type="date" class="form-control" name="fecha" required>
-            </div>
-
-            <div class="form-group">
-                <label for="hora_entrada">Hora de Entrada</label>
-                <input type="time" class="form-control" name="hora_entrada" required>
-            </div>
-
-            <div class="form-group">
-                <label for="hora_salida">Hora de Salida</label>
-                <input type="time" class="form-control" name="hora_salida" required>
-            </div>
-
-            <div class="form-group">
-                <label for="tipo">Tipo de Asistencia</label>
-                <select class="form-control" name="tipo" required>
-                    <option value="Jornada Completa">Jornada Completa</option>
-                    <option value="Medio Día">Medio Día</option>
-                    <option value="Ausente">Ausente</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="observaciones">Observaciones</label>
-                <textarea class="form-control" name="observaciones" rows="3"></textarea>
-            </div>
-
-            <button type="submit" class="btn btn-primary">Registrar Asistencia</button>
-        </form>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="mb-0">Listado de Asistencias</h3>
+        <a href="{{ route('asistencias.create') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Nueva Asistencia
+        </a>
     </div>
+
+    @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+
+    <div class="table-responsive shadow-sm border rounded p-3 bg-white">
+        <table class="table table-hover table-bordered align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>Empleado</th>
+                    <th>Fecha</th>
+                    <th>Entrada</th>
+                    <th>Salida</th>
+                    <th>Tipo</th>
+                    <th>Observaciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($asistencias as $asistencia)
+                    <tr>
+                        <td>{{ $loop->iteration }}</td>
+                        <td>{{ $asistencia->empleado->nombre_completo ?? $asistencia->num_empleado }}</td>
+                        <td>{{ \Carbon\Carbon::parse($asistencia->fecha)->format('d/m/Y') }}</td>
+                        <td>{{ $asistencia->hora_entrada }}</td>
+                        <td>{{ $asistencia->hora_salida }}</td>
+                        <td>{{ $asistencia->tipo }}</td>
+                        <td>{{ $asistencia->observaciones ?? '-' }}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="7" class="text-center text-muted">No hay asistencias registradas.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</div>
 @endsection

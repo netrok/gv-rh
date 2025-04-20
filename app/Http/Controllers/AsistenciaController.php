@@ -10,27 +10,27 @@ class AsistenciaController extends Controller
 {
     public function index()
     {
-        // Obtener todos los empleados para mostrar en el formulario
-        $empleados = Empleado::all();
-        return view('asistencias.index', compact('empleados'));
+        $asistencias = Asistencia::with('empleado')->orderBy('fecha', 'desc')->get();
+        return view('asistencias.index', compact('asistencias'));
     }
 
+    public function create()
+    {
+        $empleados = Empleado::orderBy('nombres')->get(); // Asegúrate de tener el campo 'nombre' en tu tabla de empleados
+        return view('asistencias.create', compact('empleados'));
+    }
     public function store(Request $request)
     {
-        // Validar los datos del formulario
-        $validated = $request->validate([
-            'num_empleado' => 'required|exists:tbl_empleados,num_empleado',
+        $request->validate([
+            'empleado_id' => 'required|exists:empleados,id',
             'fecha' => 'required|date',
-            'hora_entrada' => 'required|date_format:H:i',
-            'hora_salida' => 'required|date_format:H:i',
-            'tipo' => 'required|string',
-            'observaciones' => 'nullable|string',
+            'hora_entrada' => 'required',
+            'hora_salida' => 'nullable',
+            'tipo' => 'required',
         ]);
 
-        // Crear una nueva asistencia
-        Asistencia::create($validated);
+        Asistencia::create($request->all());
 
-        // Redirigir con un mensaje de éxito
-        return redirect()->route('asistencias.index')->with('success', 'Asistencia registrada correctamente');
+        return redirect()->route('asistencias.index')->with('success', 'Asistencia registrada correctamente.');
     }
 }

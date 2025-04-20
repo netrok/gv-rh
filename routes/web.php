@@ -15,7 +15,6 @@ use App\Http\Controllers\SolicitudVacacionController;
 use App\Http\Controllers\AuditController;
 use App\Http\Controllers\AsistenciaController;
 
-
 // ------------------- Página de bienvenida -------------------
 Route::get('/', fn() => view('welcome'));
 
@@ -93,6 +92,8 @@ Route::middleware(['auth'])->group(function () {
     });
 });
 
-
+// ------------------- Asistencias -------------------
 Route::get('asistencias', [AsistenciaController::class, 'index'])->name('asistencias.index');
+Route::get('asistencias/create', [AsistenciaController::class, 'create'])->name('asistencias.create');
 Route::post('asistencias', [AsistenciaController::class, 'store'])->name('asistencias.store');
+Route::resource('asistencias', AsistenciaController::class); // Solo esta línea es suficiente
