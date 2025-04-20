@@ -10,7 +10,11 @@ class CreateTblEmpleadosTable extends Migration
     {
         Schema::create('tbl_empleados', function (Blueprint $table) {
             $table->id('id_empleado');
-            $table->string('num_empleado'); // en todas las tablas donde aplique            $table->string('nombres', 150);
+
+            // Cambiado a BIGINT y se agregó UNIQUE para claves foráneas
+            $table->bigInteger('num_empleado')->unique(); 
+
+            $table->string('nombres', 150);
             $table->string('apellidos', 150);
             $table->string('domicilio', 255);
             $table->date('fecha_nacimiento');
@@ -29,7 +33,7 @@ class CreateTblEmpleadosTable extends Migration
             $table->string('imagen')->nullable();
             $table->timestamps();
 
-            // Crear claves foráneas normalmente
+            // Claves foráneas
             $table->foreign('fk_id_puesto')
                 ->references('id_puesto')->on('tbl_puestos')
                 ->onDelete('cascade');
@@ -42,7 +46,7 @@ class CreateTblEmpleadosTable extends Migration
 
     public function down()
     {
-        // IMPORTANTE: eliminar primero las foreign keys para evitar errores al hacer rollback
+        // Eliminar foreign keys primero
         Schema::table('tbl_empleados', function (Blueprint $table) {
             $table->dropForeign(['fk_id_puesto']);
             $table->dropForeign(['fk_id_sucursal']);
