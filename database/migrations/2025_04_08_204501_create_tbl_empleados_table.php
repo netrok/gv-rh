@@ -10,8 +10,7 @@ class CreateTblEmpleadosTable extends Migration
     {
         Schema::create('tbl_empleados', function (Blueprint $table) {
             $table->id('id_empleado');
-            $table->integer('num_empleado')->unique();
-            $table->string('nombres', 150);
+            $table->string('num_empleado'); // en todas las tablas donde aplique            $table->string('nombres', 150);
             $table->string('apellidos', 150);
             $table->string('domicilio', 255);
             $table->date('fecha_nacimiento');

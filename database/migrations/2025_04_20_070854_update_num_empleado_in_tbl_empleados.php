@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('tbl_empleados', function (Blueprint $table) {
-            $table->bigInteger('num_empleado')->change(); // Cambiar tipo a bigint
-        });
+       // Schema::table('tbl_empleados', function (Blueprint $table) {
+        //    $table->bigInteger('num_empleado')->change(); // Cambiar tipo de columna
+       // });
     }
 
     /**
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('tbl_empleados', function (Blueprint $table) {
-            $table->string('num_empleado')->change(); // Regresar a string (o el tipo original)
+            $table->string('num_empleado')->change(); // Regresar tipo a string
         });
     }
 };
