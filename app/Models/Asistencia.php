@@ -9,10 +9,19 @@ class Asistencia extends Model
 {
     use HasFactory;
 
+    protected $table = 'asistencias';
+
+    protected $fillable = [
+        'num_empleado',
+        'fecha',
+        'hora_entrada',
+        'hora_salida',
+        'tipo',
+        'observaciones',
+    ];
+
     public function empleado()
     {
-        return $this->belongsTo(Empleado::class);
+        return $this->belongsTo(Empleado::class, 'num_empleado', 'num_empleado');
     }
 }
-
-

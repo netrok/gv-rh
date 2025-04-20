@@ -13,6 +13,8 @@ use App\Http\Controllers\PuestoController;
 use App\Http\Controllers\SucursalController;
 use App\Http\Controllers\SolicitudVacacionController;
 use App\Http\Controllers\AuditController;
+use App\Http\Controllers\AsistenciaController;
+
 
 // ------------------- Página de bienvenida -------------------
 Route::get('/', fn() => view('welcome'));
@@ -90,3 +92,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/auditorias/export/pdf', [AuditController::class, 'exportPdf'])->name('auditorias.export.pdf');
     });
 });
+
+
+Route::get('asistencias', [AsistenciaController::class, 'index'])->name('asistencias.index');
+Route::post('asistencias', [AsistenciaController::class, 'store'])->name('asistencias.store');
