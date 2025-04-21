@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Empleado;
 use App\Models\Asistencia;
 use Illuminate\Http\Request;
-use Barryvdh\DomPDF\Facade as PDF; // Asegúrate de usar este alias
+use Barryvdh\DomPDF\Facade\Pdf;
+
 
 
 class AsistenciaController extends Controller
@@ -79,10 +80,9 @@ class AsistenciaController extends Controller
         $asistencias = Asistencia::where('empleado_id', $empleado_id)
             ->orderBy('fecha', 'desc')
             ->get();
+        $empleados = Empleado::all();  // Add this line to pass all empleados to the view
 
-        // Cambia 'Pdf' por 'PDF'
-        $pdf = PDF::loadView('asistencias.reporte_pdf', compact('empleado', 'asistencias'));
-        
+        $pdf = PDF::loadView('asistencias.reporte_pdf', compact('empleado', 'asistencias', 'empleados'));  // Make sure to include $empleados
         return $pdf->download('reporte_asistencia_' . $empleado->num_empleado . '.pdf');
     }
 }

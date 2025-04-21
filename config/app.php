@@ -179,9 +179,11 @@ return [
     | the aliases are "lazy" loaded so they don't hinder performance.
     |
     */
-
     'aliases' => [
+        'App' => Illuminate\Support\Facades\App::class,
+        'Route' => Illuminate\Support\Facades\Route::class,
         'PDF' => Barryvdh\DomPDF\Facade::class,
+        // otros aliases...
     ],
 
 ];
