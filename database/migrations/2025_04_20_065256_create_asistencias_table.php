@@ -12,16 +12,17 @@ return new class extends Migration {
     {
         Schema::create('asistencias', function (Blueprint $table) {
             $table->id();
-            $table->string('num_empleado'); // Cambiado a string
-            $table->foreign('num_empleado')->references('num_empleado')->on('tbl_empleados')->onDelete('cascade');
+            $table->unsignedBigInteger('empleado_id'); // ID foráneo estándar
+            $table->foreign('empleado_id')->references('id_empleado')->on('tbl_empleados')->onDelete('cascade');
+
             $table->date('fecha');
             $table->time('hora_entrada')->nullable();
             $table->time('hora_salida')->nullable();
             $table->enum('tipo', ['presencial', 'remoto', 'permiso', 'falta'])->default('presencial');
             $table->string('observaciones')->nullable();
             $table->timestamps();
-        
-            $table->unique(['num_empleado', 'fecha']);
+
+            $table->unique(['empleado_id', 'fecha']);
         });
     }
 

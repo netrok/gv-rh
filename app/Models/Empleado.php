@@ -83,7 +83,13 @@ class Empleado extends Model
 
     public function asistencias()
     {
-        return $this->hasMany(Asistencia::class);
+        return $this->hasMany(Asistencia::class, 'empleado_id', 'id_empleado');
+    }
+
+
+    public function getNombreCompletoAttribute()
+    {
+        return "{$this->nombres} {$this->apellidos}";
     }
 
 }

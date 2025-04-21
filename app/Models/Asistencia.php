@@ -18,10 +18,12 @@ class Asistencia extends Model
         'hora_salida',
         'tipo',
         'observaciones',
+        'num_empleado', // 👈 necesario si la columna existe en la tabla
     ];
 
     public function empleado()
     {
-        return $this->belongsTo(Empleado::class, 'num_empleado', 'num_empleado');
+        return $this->belongsTo(Empleado::class, 'empleado_id', 'id_empleado');
     }
+
 }

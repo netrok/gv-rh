@@ -1,5 +1,4 @@
 <?php
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -11,9 +10,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        //Schema::table('asistencias', function (Blueprint $table) {
-         //   $table->bigInteger('num_empleado')->change(); // Cambiar el tipo de columna a bigint
-       // });
+        Schema::table('asistencias', function (Blueprint $table) {
+            // Verificar si la columna 'num_empleado' existe antes de modificarla
+            if (Schema::hasColumn('asistencias', 'num_empleado')) {
+                $table->string('num_empleado', 30)->nullable(false)->change();
+            } else {
+                // Si no existe, crearla
+                $table->string('num_empleado', 30)->nullable(false);
+            }
+        });
     }
 
     /**
@@ -22,7 +27,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('asistencias', function (Blueprint $table) {
-            $table->string('num_empleado')->change(); // Regresar el tipo de columna a string
+            if (Schema::hasColumn('asistencias', 'num_empleado')) {
+                $table->dropColumn('num_empleado');
+            }
         });
     }
 };

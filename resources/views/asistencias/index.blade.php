@@ -18,7 +18,8 @@
             <thead class="table-light">
                 <tr>
                     <th>#</th>
-                    <th>Empleado</th>
+                    <th>Núm. Empleado</th>
+                    <th>Nombre Completo</th>
                     <th>Fecha</th>
                     <th>Entrada</th>
                     <th>Salida</th>
@@ -30,16 +31,17 @@
                 @forelse($asistencias as $asistencia)
                     <tr>
                         <td>{{ $loop->iteration }}</td>
-                        <td>{{ $asistencia->empleado->nombre_completo ?? $asistencia->num_empleado }}</td>
+                        <td>{{ $asistencia->empleado->num_empleado ?? 'N/A' }}</td>
+                        <td>{{ $asistencia->empleado->nombre_completo ?? 'Empleado eliminado' }}</td>
                         <td>{{ \Carbon\Carbon::parse($asistencia->fecha)->format('d/m/Y') }}</td>
-                        <td>{{ $asistencia->hora_entrada }}</td>
-                        <td>{{ $asistencia->hora_salida }}</td>
-                        <td>{{ $asistencia->tipo }}</td>
+                        <td>{{ $asistencia->hora_entrada ?? '-' }}</td>
+                        <td>{{ $asistencia->hora_salida ?? '-' }}</td>
+                        <td>{{ ucfirst($asistencia->tipo) }}</td>
                         <td>{{ $asistencia->observaciones ?? '-' }}</td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="text-center text-muted">No hay asistencias registradas.</td>
+                        <td colspan="8" class="text-center text-muted">No hay asistencias registradas.</td>
                     </tr>
                 @endforelse
             </tbody>
