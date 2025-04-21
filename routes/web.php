@@ -14,6 +14,11 @@ use App\Http\Controllers\SucursalController;
 use App\Http\Controllers\SolicitudVacacionController;
 use App\Http\Controllers\AuditController;
 use App\Http\Controllers\AsistenciaController;
+use App\Exports\AsistenciasExport;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Models\Asistencia;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
 
 // ------------------- Página de bienvenida -------------------
 Route::get('/', fn() => view('welcome'));
@@ -22,7 +27,6 @@ Route::get('/', fn() => view('welcome'));
 Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('login', [LoginController::class, 'login']);
 Route::post('logout', [LoginController::class, 'logout'])->name('logout');
-
 Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('register', [RegisterController::class, 'register']);
 
@@ -93,7 +97,38 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // ------------------- Asistencias -------------------
-Route::get('asistencias', [AsistenciaController::class, 'index'])->name('asistencias.index');
-Route::get('asistencias/create', [AsistenciaController::class, 'create'])->name('asistencias.create');
-Route::post('asistencias', [AsistenciaController::class, 'store'])->name('asistencias.store');
-Route::resource('asistencias', AsistenciaController::class); // Solo esta línea es suficiente
+Route::resource('asistencias', AsistenciaController::class);
+
+// Exportaciones de Asistencias
+Route::prefix('asistencias/export')->group(function () {
+    Route::get('excel', function () {
+        return Excel::download(new AsistenciasExport, 'asistencias.xlsx');
+    })->name('asistencias.export.excel');
+
+    Route::get('pdf', function () {
+        $asistencias = Asistencia::with('empleado')->get();
+        $pdf = Pdf::loadView('asistencias.pdf', compact('asistencias'));
+        return $pdf->download('asistencias.pdf');
+    })->name('asistencias.export.pdf');
+
+    Route::get('pdf-filtrado', function (Request $request) {
+        $query = Asistencia::with('empleado');
+
+        if ($request->filled('fecha_inicio') && $request->filled('fecha_fin')) {
+            $query->whereBetween('fecha', [$request->fecha_inicio, $request->fecha_fin]);
+        }
+
+        if ($request->filled('tipo')) {
+            $query->where('tipo', $request->tipo);
+        }
+
+        $asistencias = $query->get();
+        $pdf = Pdf::loadView('asistencias.pdf', compact('asistencias'));
+
+        return $pdf->download('asistencias-filtrado.pdf');
+    })->name('asistencias.export.pdf.filtrado');
+});
+
+Route::get('/reporte-asistencia', [AsistenciaController::class, 'reporte'])->name('asistencias.reporte');
+Route::get('/reporte-asistencia/pdf/{empleado}', [AsistenciaController::class, 'reportePdf'])->name('asistencias.reporte.pdf');
+Route::get('/reporte-asistencia/pdf/{empleado}', [AsistenciaController::class, 'reportePdf'])->name('asistencias.reporte.pdf');

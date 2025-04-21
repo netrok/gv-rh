@@ -70,8 +70,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
-
+    'timezone' => 'America/Mexico_City', // Cambia esto según tu ubicación
     /*
     |--------------------------------------------------------------------------
     | Application Locale Configuration
@@ -181,8 +180,8 @@ return [
     |
     */
 
-    'aliases' => Facade::defaultAliases()->merge([
-        // 'Example' => App\Facades\Example::class,
-    ])->toArray()
+    'aliases' => [
+        'PDF' => Barryvdh\DomPDF\Facade::class,
+    ],
 
 ];

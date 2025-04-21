@@ -26,4 +26,23 @@ class Asistencia extends Model
         return $this->belongsTo(Empleado::class, 'empleado_id', 'id_empleado');
     }
 
+
+    public function scopeBuscar($query, $termino)
+    {
+        if ($termino) {
+            $query->whereHas('empleado', function ($q) use ($termino) {
+                $q->where('nombres', 'ILIKE', "%$termino%")
+                    ->orWhere('apellidos', 'ILIKE', "%$termino%")
+                    ->orWhere('num_empleado', 'ILIKE', "%$termino%");
+            });
+        }
+    }
+
+    public function scopeFecha($query, $fecha)
+    {
+        if ($fecha) {
+            $query->whereDate('fecha', $fecha);
+        }
+    }
+
 }
