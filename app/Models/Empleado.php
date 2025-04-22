@@ -52,9 +52,9 @@ class Empleado extends Model
         return $this->hasMany(Beneficiario::class, 'fk_num_empleado');
     }
 
-    public function solicitudesVacaciones()
+    public function Vacaciones()
     {
-        return $this->hasMany(SolicitudVacacion::class, 'fk_num_empleado');
+        return $this->hasMany(mVacaciones::class, 'fk_num_empleado');
     }
 
     public static function boot()

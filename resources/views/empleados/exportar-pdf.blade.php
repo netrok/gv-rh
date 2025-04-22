@@ -145,12 +145,12 @@
     {{-- Numeración de páginas --}}
     @if (isset($pdf))
         <script type="text/php">
-                if (isset($pdf)) {
-                    $pdf->page_script(function($pageNumber, $pageCount, $pdf) {
-                        $pdf->text(500, 820, "Página $pageNumber de $pageCount", null, 10);
-                    });
-                }
-            </script>
+                    if (isset($pdf)) {
+                        $pdf->page_script(function($pageNumber, $pageCount, $pdf) {
+                            $pdf->text(500, 820, "Página $pageNumber de $pageCount", null, 10);
+                        });
+                    }
+                </script>
     @endif
 
     <div class="footer">

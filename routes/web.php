@@ -2,47 +2,50 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\RolePermissionController;
-use App\Http\Controllers\EmpleadoController;
-use App\Http\Controllers\EmpleadoExportController;
-use App\Http\Controllers\BeneficiarioController;
-use App\Http\Controllers\PuestoController;
-use App\Http\Controllers\SucursalController;
-use App\Http\Controllers\SolicitudVacacionController;
-use App\Http\Controllers\AuditController;
-use App\Http\Controllers\AsistenciaController;
+use Illuminate\Http\Request;
+use App\Http\Controllers\{
+    Auth\LoginController,
+    Auth\RegisterController,
+    DashboardController,
+    RolePermissionController,
+    EmpleadoController,
+    EmpleadoExportController,
+    BeneficiarioController,
+    PuestoController,
+    SucursalController,
+    AuditController,
+    AsistenciaController,
+    VacacionesController
+};
 use App\Exports\AsistenciasExport;
-use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Asistencia;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
-// ------------------- Página de bienvenida -------------------
+// -------------------- Página de Bienvenida --------------------
 Route::get('/', fn() => view('welcome'));
 
-// ------------------- Autenticación -------------------
+// -------------------- Autenticación --------------------
 Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('login', [LoginController::class, 'login']);
 Route::post('logout', [LoginController::class, 'logout'])->name('logout');
+
 Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('register', [RegisterController::class, 'register']);
 
-Auth::routes(); // Rutas por defecto de Laravel
+Auth::routes(); // Rutas por defecto
 
-// ------------------- Acceso público -------------------
+// -------------------- Público --------------------
 Route::get('beneficiarios/{id}/pdf', [BeneficiarioController::class, 'generarPdf'])->name('beneficiarios.generarPdf');
 
-// ------------------- Área Protegida -------------------
+// -------------------- Área Protegida --------------------
 Route::middleware(['auth'])->group(function () {
 
     // ----------- Dashboard -----------
     Route::get('/home', [DashboardController::class, 'index'])->name('home');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // ----------- Roles y Permisos (solo admin) -----------
+    // ----------- Gestión de Roles y Permisos (solo admin) -----------
     Route::middleware('role:admin')->group(function () {
         Route::resource('roles', RolePermissionController::class)->except(['show', 'destroy']);
         Route::post('roles/{roleId}/permissions', [RolePermissionController::class, 'assignPermissions'])->name('roles.assignPermissions');
@@ -50,7 +53,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('users/{userId}/assign-role', [RolePermissionController::class, 'assignRoleToUser'])->name('roles.assignRoleToUser');
     });
 
-    // ----------- Empleados -----------
+    // ----------- Empleados (solo admin) -----------
     Route::middleware('role:admin')->group(function () {
         Route::resource('empleados', EmpleadoController::class)->except(['show']);
         Route::get('empleados/{id_empleado}/pdf', [EmpleadoController::class, 'generarPdf'])->name('empleados.pdf');
@@ -62,17 +65,15 @@ Route::middleware(['auth'])->group(function () {
         Route::get('empleados/exportar-pdf', [EmpleadoController::class, 'exportarPdf'])->name('empleados.exportarPdf');
     });
 
-    // Visualización individual (admin y empleado)
-    Route::middleware('role:admin|empleado')->group(function () {
-        Route::get('empleados/{id_empleado}/show', [EmpleadoController::class, 'show'])->name('empleados.show');
-    });
+    // ----------- Vista individual de empleados (admin y empleado) -----------
+    Route::middleware('role:admin|empleado')->get('empleados/{id_empleado}/show', [EmpleadoController::class, 'show'])->name('empleados.show');
 
-    // ----------- Módulos de Gestión (solo admin) -----------
+    // ----------- Gestión de módulos administrativos (solo admin) -----------
     Route::middleware('role:admin')->group(function () {
         Route::resources([
             'puestos' => PuestoController::class,
             'beneficiarios' => BeneficiarioController::class,
-            'solicitudes-vacaciones' => SolicitudVacacionController::class,
+            'vacaciones' => VacacionesController::class,
             'sucursales' => SucursalController::class,
         ]);
 
@@ -80,11 +81,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('sucursales/export/excel', [SucursalController::class, 'exportExcel'])->name('sucursales.export.excel');
         Route::get('sucursales/export/pdf', [SucursalController::class, 'exportPDF'])->name('sucursales.export.pdf');
 
-        // Actualización explícita de sucursales
+        // Actualización de sucursales
         Route::put('sucursales/{sucursal}', [SucursalController::class, 'update'])->name('sucursales.update');
     });
 
-    // ----------- Configuración avanzada -----------
+    // ----------- Configuración (con permisos) -----------
     Route::get('/configuracion', fn() => 'Configuración avanzada')
         ->middleware('role_or_permission:admin|editar empleados');
 
@@ -96,14 +97,12 @@ Route::middleware(['auth'])->group(function () {
     });
 });
 
-// ------------------- Asistencias -------------------
+// -------------------- Asistencias --------------------
 Route::resource('asistencias', AsistenciaController::class);
 
-// Exportaciones de Asistencias
+// ----------- Exportaciones de Asistencias -----------
 Route::prefix('asistencias/export')->group(function () {
-    Route::get('excel', function () {
-        return Excel::download(new AsistenciasExport, 'asistencias.xlsx');
-    })->name('asistencias.export.excel');
+    Route::get('excel', fn() => Excel::download(new AsistenciasExport, 'asistencias.xlsx'))->name('asistencias.export.excel');
 
     Route::get('pdf', function () {
         $asistencias = Asistencia::with('empleado')->get();
@@ -129,11 +128,11 @@ Route::prefix('asistencias/export')->group(function () {
     })->name('asistencias.export.pdf.filtrado');
 });
 
+// ----------- Reportes de Asistencia -----------
 Route::get('/reporte-asistencia', [AsistenciaController::class, 'reporte'])->name('asistencias.reporte');
 Route::get('/reporte-asistencia/pdf/{empleado}', [AsistenciaController::class, 'reportePdf'])->name('asistencias.reporte.pdf');
-Route::get('/reporte-asistencia/pdf/{empleado}', [AsistenciaController::class, 'reportePdf'])->name('asistencias.reporte.pdf');
 
-// routes/web.php
-Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->middleware(['auth', 'role:admin'])
-    ->name('dashboard');
+// ----------- Crear Vacaciones (solo admin, si corresponde) -----------
+Route::get('/vacaciones/create', [VacacionesController::class, 'create'])->name('vacaciones.create');
+Route::get('/vacaciones/{id}/edit', [VacacionesController::class, 'edit'])->name('vacaciones.edit');
+
