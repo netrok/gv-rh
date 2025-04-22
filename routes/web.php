@@ -132,3 +132,8 @@ Route::prefix('asistencias/export')->group(function () {
 Route::get('/reporte-asistencia', [AsistenciaController::class, 'reporte'])->name('asistencias.reporte');
 Route::get('/reporte-asistencia/pdf/{empleado}', [AsistenciaController::class, 'reportePdf'])->name('asistencias.reporte.pdf');
 Route::get('/reporte-asistencia/pdf/{empleado}', [AsistenciaController::class, 'reportePdf'])->name('asistencias.reporte.pdf');
+
+// routes/web.php
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('dashboard');

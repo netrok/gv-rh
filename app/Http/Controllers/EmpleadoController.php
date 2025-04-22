@@ -57,12 +57,24 @@ class EmpleadoController extends Controller
         return $pdf->download('empleados.pdf');
     }
 
-    public function exportarPdf()
+ /*   public function exportarPdf()
     {
         $empleados = Empleado::all();
         $pdf = PDF::loadView('empleados.exportar-pdf', compact('empleados'));
         return $pdf->stream('empleados.pdf');
     }
+*/
+    public function exportarPdf()
+{
+    $empleados = Empleado::all();
+    $pdf = PDF::loadView('empleados.exportar-pdf', compact('empleados'));
+
+    // Agregar numeración de páginas
+    $pdf->setOption('isHtml5ParserEnabled', true);
+    $pdf->setOption('isPhpEnabled', true);
+    
+    return $pdf->stream('empleados.pdf');
+}
 
     public function create()
     {

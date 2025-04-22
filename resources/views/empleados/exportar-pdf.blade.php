@@ -1,5 +1,8 @@
+@php use Illuminate\Support\Facades\Auth; @endphp
+
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Reporte de Empleados</title>
@@ -95,6 +98,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <div class="watermark">CONFIDENCIAL</div>
@@ -141,17 +145,19 @@
     {{-- Numeración de páginas --}}
     @if (isset($pdf))
         <script type="text/php">
-            if (isset($pdf)) {
-                $pdf->page_script(function($pageNumber, $pageCount, $pdf) {
-                    $pdf->text(500, 820, "Página $pageNumber de $pageCount", null, 10);
-                });
-            }
-        </script>
+                if (isset($pdf)) {
+                    $pdf->page_script(function($pageNumber, $pageCount, $pdf) {
+                        $pdf->text(500, 820, "Página $pageNumber de $pageCount", null, 10);
+                    });
+                }
+            </script>
     @endif
 
     <div class="footer">
-        Documento confidencial. Generado automáticamente por el sistema de gestión de empleados.
+        Documento confidencial. Generado automáticamente por el sistema de gestión de empleados. <br>
+        Página {PAGE_NUM} de {PAGE_COUNT}
     </div>
 
 </body>
+
 </html>
