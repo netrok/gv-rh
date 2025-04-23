@@ -4,7 +4,7 @@
     <div class="container">
         <h1 class="mb-4">Editar Solicitud de Vacaciones</h1>
 
-        <form action="{{ route('vacaciones.update', $vacacion->id) }}" method="POST" id="form-vacacion">
+        <form action="{{ route('vacaciones.update', $vacacion->id) }}" method="POST">
             @csrf
             @method('PUT')
 
@@ -62,45 +62,9 @@
 
             <div class="d-flex justify-content-between mt-4">
                 <a href="{{ route('vacaciones.index') }}" class="btn btn-secondary">Cancelar</a>
-                <!-- Botón sin submit para que no se envíe el formulario directamente -->
-                <button type="button" class="btn btn-primary" id="guardarBtn">Guardar Cambios</button>
+                <!-- Este botón ahora envía el formulario directamente -->
+                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
             </div>
         </form>
     </div>
-
-    <!-- Modal de Confirmación -->
-    <div class="modal fade" id="confirmarModal" tabindex="-1" aria-labelledby="confirmarModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="confirmarModalLabel">Confirmar Actualización</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    ¿Estás seguro de que deseas guardar los cambios?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <!-- Botón que confirma el envío del formulario -->
-                    <button type="button" id="confirmarBtn" class="btn btn-primary">Confirmar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    @push('scripts')
-        <script>
-            // Mostrar el modal al hacer clic en "Guardar Cambios"
-            document.getElementById('guardarBtn').addEventListener('click', function(event) {
-                event.preventDefault(); // Prevenir el envío del formulario
-                var modal = new bootstrap.Modal(document.getElementById('confirmarModal'));
-                modal.show(); // Mostrar el modal
-            });
-
-            // Enviar el formulario cuando se confirme
-            document.getElementById('confirmarBtn').addEventListener('click', function() {
-                document.getElementById('form-vacacion').submit(); // Enviar el formulario
-            });
-        </script>
-    @endpush
 @endsection

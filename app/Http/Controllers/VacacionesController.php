@@ -46,12 +46,11 @@ class VacacionesController extends Controller
     }
 
     public function edit($id)
-{
-    $vacacion = mVacaciones::findOrFail($id);
-    $empleados = Empleado::all(); // Variable correcta para la lista de empleados
-    return view('vacaciones.edit', ['vacacion' => $vacacion, 'empleados' => $empleados]); // Se pasa 'solicitud' a la vista
-}
-
+    {
+        $vacacion = mVacaciones::findOrFail($id);
+        $empleados = Empleado::all(); // Variable correcta para la lista de empleados
+        return view('vacaciones.edit', ['vacacion' => $vacacion, 'empleados' => $empleados]); // Se pasa 'vacacion' a la vista
+    }
 
     public function update(Request $request, $id)
     {
@@ -67,7 +66,18 @@ class VacacionesController extends Controller
         ]);
 
         $vacacion = mVacaciones::findOrFail($id);
-        $vacacion->update($request->all());
+        
+        // Asegúrate de que sólo los campos relevantes sean actualizados
+        $vacacion->update([
+            'fk_num_empleado' => $request->fk_num_empleado,
+            'anio' => $request->anio,
+            'dias_otorgados' => $request->dias_otorgados,
+            'dias_disfrutados' => $request->dias_disfrutados,
+            'saldo' => $request->saldo,
+            'observaciones' => $request->observaciones,
+            'estado_solicitud' => $request->estado_solicitud,
+            'fecha_solicitud' => $request->fecha_solicitud,
+        ]);
 
         return redirect()->route('vacaciones.index')->with('success', 'Registro de vacaciones actualizado con éxito.');
     }

@@ -13,7 +13,6 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 
-
 class EmpleadoController extends Controller
 {
     public function index(Request $request)
@@ -57,25 +56,6 @@ class EmpleadoController extends Controller
         $pdf = Pdf::loadView('empleados.export-pdf', compact('empleados'));
         return $pdf->download('empleados.pdf');
     }
-
- /*   public function exportarPdf()
-    {
-        $empleados = Empleado::all();
-        $pdf = PDF::loadView('empleados.exportar-pdf', compact('empleados'));
-        return $pdf->stream('empleados.pdf');
-    }
-*/
-    public function exportarPdf()
-{
-    $empleados = Empleado::all();
-    $pdf = PDF::loadView('empleados.exportar-pdf', compact('empleados'));
-
-    // Agregar numeración de páginas
-    $pdf->setOption('isHtml5ParserEnabled', true);
-    $pdf->setOption('isPhpEnabled', true);
-    
-    return $pdf->stream('empleados.pdf');
-}
 
     public function create()
     {

@@ -1,7 +1,5 @@
 {{-- resources/views/empleados/partials/form.blade.php --}}
-@php
-    use Illuminate\Support\Facades\Storage;
-@endphp
+@php use Illuminate\Support\Facades\Storage; @endphp
 
 
 @if ($errors->any())

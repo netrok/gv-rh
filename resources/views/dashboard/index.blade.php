@@ -18,6 +18,12 @@
             <li class="nav-item">
                 <a class="nav-link text-white" href="{{ route('puestos.index') }}">Puestos</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" href="{{ route('vacaciones.index') }}">Vacaciones</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" href="{{ route('beneficiarios.index') }}">Beneficiarios</a>
+            </li>
         </ul>
     </div>
 
